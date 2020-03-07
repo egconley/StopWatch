@@ -1,5 +1,27 @@
 # StopWatch Software Requirements
 
+## Vision
+It can be a challenge to make use of time spent on the bus to read a book or listen to a podcast if you’re worried that you’ll miss your stop.  The goal of StopWatch is to release bus commuters of the need to keep track of stops so that they fully devote their attention else, worry free.
+
+## Scope
+### In Scope
+#### MVP
+- Provide an interactive map for users to set a destination for the stop where they plan to get off the bus
+- Set a notification radius around a user-selected destination
+- Notify users when their location is within-radius of their destination
+#### Stretch
+- Generate a list of nearby bus stops and routes based on user location
+- Display bus stops serviced by user-selected bus routes
+- Allow users to select a destination from a list of bus stops enroute for their bus
+
+### Out of Scope
+- Help users plan their bus trip
+
+## Functional Requirements
+### Data Flow
+
+## Non-Functional Requirements
+
 ## User Stories
 ### MVP
 1. As a user, I want to be able to select a location on a map and set it as my destination endpoint so that I can be notified when I am close to my destination.
