@@ -50,11 +50,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import static android.provider.SettingsSlicesContract.KEY_LOCATION;
+
 public class MapActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private CameraPosition mCameraPosition;
     private FusedLocationProviderClient fusedLocationClient;
+
+    // Keys for storing activity state.
+    private static final String KEY_CAMERA_POSITION = "camera_position";
+    private static final String KEY_LOCATION = "location";
+
+    // The geographical location where the device is currently located. That is, the last-known
+    // location retrieved by the Fused Location Provider.
+    private Location mLastKnownLocation;
+
     double longitude;
     double latitude;
     int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
@@ -62,10 +74,20 @@ public class MapActivity extends AppCompatActivity
     List<Address> addresses;
     LocationManager locationManager;
     Marker marker;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Retrieve location and camera position from saved instance state.
+        if (savedInstanceState != null) {
+            mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+        }
+
         setContentView(R.layout.map_fragment);
+
         ActivityCompat.requestPermissions(MapActivity.this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 1);
@@ -195,15 +217,49 @@ public class MapActivity extends AppCompatActivity
                     }
                 });
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (mMap != null) {
+            outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
+            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
+            super.onSaveInstanceState(outState);
+        }
+    }
+
+    /**
+     * Sets up the options menu.
+     * @param menu The options menu.
+     * @return Boolean.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.current_place_menu, menu);
+        return true;
+    }
+
+    /**
+     * Handles a click on the menu option to get a place.
+     * @param //item The menu item to handle.
+     * @return Boolean.
+     */
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        if (item.getItemId() == R.id.option_get_place) {
+//            showCurrentPlace();
+//        }
+//        return true;
+//    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         marker = mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)));
 //        if (latitude != 0) {
 //            map = googleMap;
-//            LatLng userLocation = new LatLng(latitude, longitude);
+            LatLng userLocation = new LatLng(latitude, longitude);
 //            map.addMarker(new MarkerOptions().position(userLocation).title("User Location"));
-//            map.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
 //        }
     }
 }
