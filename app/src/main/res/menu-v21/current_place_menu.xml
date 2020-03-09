@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:appcompat="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/menu_search"
+        android:title="@string/menu_searchbar"
+        appcompat:actionViewClass="android.support.v7.widget.SearchView"
+        appcompat:showAsAction="always"/>
+
+    <item
+        android:id="@+id/option_get_place"
+        android:title="@string/option_set_destination"
+        app:showAsAction="always"/>
+
+
+    <!--    <SearchView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:id="@+id/destination"-->
+<!--        android:queryHint="Search..."-->
+<!--        android:iconifiedByDefault="false"-->
+<!--        android:layout_margin="10dp"-->
+<!--        android:elevation="5dp"-->
+<!--        android:background="@drawable/bg_round"-->
+
+<!--        />-->
+
+</menu>

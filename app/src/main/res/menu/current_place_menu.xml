@@ -1,8 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/option_get_place"
-        android:title="@string/option_set_destination"
-        app:showAsAction="always"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:appcompat="http://schemas.android.com/tools">
+
+    <group
+        android:id="@+id/main_options_menu_group">
+        <item
+            android:id="@+id/menu_search"
+            android:icon="@drawable/quantum_ic_search_grey600_24"
+            android:title="@string/menu_searchbar"
+            app:showAsAction="collapseActionView|ifRoom"
+            appcompat:actionViewClass="android.support.v7.widget.SearchView" />
+        <item
+            android:id="@+id/option_get_place"
+            android:title="@string/option_set_destination" />
+
+    </group>
+
+
+<!--    <SearchView-->
+<!--        android:id="@+id/destination"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="10dp"-->
+<!--        android:background="@drawable/bg_round"-->
+<!--        android:elevation="5dp"-->
+<!--        android:iconifiedByDefault="false"-->
+<!--        android:queryHint="Search..."-->
+
+<!--        />-->
+
 </menu>
