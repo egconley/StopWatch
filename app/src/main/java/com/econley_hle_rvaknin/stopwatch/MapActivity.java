@@ -88,9 +88,17 @@ public class MapActivity extends AppCompatActivity
 
         setContentView(R.layout.map_fragment);
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+
+
+
         ActivityCompat.requestPermissions(MapActivity.this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 1);
+
+
+
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -114,7 +122,14 @@ public class MapActivity extends AppCompatActivity
         } else {
             // Permission has already been granted
         }
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        getDeviceLocation();
+
+
+    }
+
+    private void getDeviceLocation() {
+
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -251,15 +266,34 @@ public class MapActivity extends AppCompatActivity
 //        return true;
 //    }
 
+    /**
+     * Manipulates the map when it's available.
+     * The API invokes this callback when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user receives a prompt to install
+     * Play services inside the SupportMapFragment. The API invokes this method after the user has
+     * installed Google Play services and returned to the app.
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+//        getDeviceLocation();
+
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+
+        LatLng userLocation = new LatLng(latitude, longitude);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
+
         marker = mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)));
 //        if (latitude != 0) {
 //            map = googleMap;
-            LatLng userLocation = new LatLng(latitude, longitude);
 //            map.addMarker(new MarkerOptions().position(userLocation).title("User Location"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
+
 //        }
     }
 }
