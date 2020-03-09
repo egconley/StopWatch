@@ -59,6 +59,8 @@ public class MapActivity extends AppCompatActivity
     private CameraPosition mCameraPosition;
     private FusedLocationProviderClient fusedLocationClient;
 
+    private boolean mLocationPermissionGranted;
+
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
@@ -90,42 +92,36 @@ public class MapActivity extends AppCompatActivity
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(MapActivity.this);
 
 
         ActivityCompat.requestPermissions(MapActivity.this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 1);
 
-
-
-        // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-                // No explanation needed; request the permission
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        } else {
-            // Permission has already been granted
-        }
+        getLocationPermission();
 
         getDeviceLocation();
 
 
+    }
+
+    private void getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true;
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+        }
     }
 
     private void getDeviceLocation() {
@@ -146,8 +142,6 @@ public class MapActivity extends AppCompatActivity
                                 addresses = geocoder.getFromLocation(latitude, longitude, 1);
 //                                TextView myLocation = findViewById(R.id.myLocation);
 //                                myLocation.setText(addresses.get(0).getAddressLine(0));
-                                SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-                                mapFragment.getMapAsync(MapActivity.this);
                                 locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                                 if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                                     // TODO: Consider calling
@@ -172,7 +166,7 @@ public class MapActivity extends AppCompatActivity
                                                 String address = addresses.get(0).getAddressLine(0);
 //                                                TextView myLocation = findViewById(R.id.myLocation);
 //                                                myLocation.setText(address);
-                                                marker.setPosition(userLocation);// add a marker on the map
+//                                                marker.setPosition(userLocation);// add a marker on the map
                                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,15)); // move camera to that location
                                             } catch (IOException e) {
                                                 e.printStackTrace();
@@ -202,7 +196,7 @@ public class MapActivity extends AppCompatActivity
                                                 String address = addresses.get(0).getAddressLine(0);
 //                                                TextView myLocation = findViewById(R.id.myLocation);
 //                                                myLocation.setText(address);
-                                                marker.setPosition(userLocation);
+//                                                marker.setPosition(userLocation);
                                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,10.2f)); // move camera to that location
                                             } catch (IOException e) {
                                                 e.printStackTrace();
@@ -289,8 +283,8 @@ public class MapActivity extends AppCompatActivity
         LatLng userLocation = new LatLng(latitude, longitude);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
 
-        marker = mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)));
-//        if (latitude != 0) {
+//        marker = mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)));
+//        if (latitude != 0) {`
 //            map = googleMap;
 //            map.addMarker(new MarkerOptions().position(userLocation).title("User Location"));
 
