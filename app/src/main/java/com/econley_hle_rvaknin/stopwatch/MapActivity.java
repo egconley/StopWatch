@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
@@ -21,10 +22,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import androidx.appcompat.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -49,7 +53,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
 import static android.provider.SettingsSlicesContract.KEY_LOCATION;
 
 public class MapActivity extends AppCompatActivity
@@ -58,6 +61,13 @@ public class MapActivity extends AppCompatActivity
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
     private FusedLocationProviderClient fusedLocationClient;
+
+    ///////////////////////////////////////////////////////////////
+//    private SearchView searchView;
+    private SupportMapFragment mapFragment;
+    SearchView searchView;
+    ///////////////////////////////////////////////////////////////
+
 
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -216,6 +226,46 @@ public class MapActivity extends AppCompatActivity
                         Log.i("rvrv", "failure... location is null!!");
                     }
                 });
+
+
+///////////////////////////////////////////////////////////////
+//        searchView = findViewById(R.id.menu_search);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+//        Log.i("haitle16.MapActivity", "data from searchView: " +searchView);
+
+
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                String location = searchView.getQuery().toString();
+//                List<Address> destination = null;
+//
+//                if(location!= null || !location.equals("")) {
+//                    Geocoder geocoder = new Geocoder(MapActivity.this);
+//                    try {
+//                        destination = geocoder.getFromLocationName(location,1);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    Address address = destination.get(0);
+//                    LatLng latLng = new LatLng(address.getLatitude(), address.getLatitude());
+//                    mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
+//
+//
+//                }
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String query) {
+//                return false;
+//            }
+//        });
+        mapFragment.getMapAsync(this);
+        ///////////////////////////////////////////////////////////////
+
+
     }
 
     @Override
@@ -235,6 +285,52 @@ public class MapActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.current_place_menu, menu);
+        final MenuItem searchMenu = menu.findItem(R.id.menu_search);
+//        androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) MenuItemCompat.getActionView(searchMenu);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
+
+        Log.i("haitle16.MapActivity", "data from searchView: " +searchView);
+
+        if(searchView != null) {
+            Log.i("haitle16.MapActivity", "getting into searchView");
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    String location = searchView.getQuery().toString();
+                    List<Address> destination = null;
+
+                    Log.i("haitle16.MapActivity", "getting into into into  searchView");
+
+                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                    try {
+                        destination = geocoder.getFromLocationName(location,1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Address address = destination.get(0);
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLatitude());
+                    mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
+                    Log.i("haitle16.MapActivity", "Data from latLng"+latLng);
+                    Log.i("haitle16.MapActivity", "Data from address"+address);
+                    // lat and long is under address.lat,long
+
+
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String query) {
+                    return false;
+                }
+            });
+        }
+//        Log.i("haitle16.MapActivity", "data from searchView: " +searchView2);
+
+
+
+
         return true;
     }
 
