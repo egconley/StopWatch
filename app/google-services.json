@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "530359008983-mfld4eb5rob4cng3d7ho2f571rjl9md9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.econley_hle_rvaknin.stopwatch",
+            "certificate_hash": "eec2eac72c0ef3a0d259197f071737048561b9b4"
+          }
+        },
+        {
           "client_id": "530359008983-cmqltesg9k550dfclicr9umdtql0nu9s.apps.googleusercontent.com",
           "client_type": 3
         }
