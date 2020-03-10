@@ -253,32 +253,45 @@ public class MapActivity extends AppCompatActivity
                         mMap.clear();
 
                         mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(address)));
-                        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
-                        dialogbuilder.setTitle("Set destination?");
-                        dialogbuilder.setMessage(address.getAddressLine(0));
-                        dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Do something when user clicked the Yes button
-                                destionationLatLng = latLng;
+                        new android.os.Handler().postDelayed(
+                                new Runnable() {
+                                    public void run() {
+                                        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
+                                        dialogbuilder.setTitle("Set destination?");
+                                        dialogbuilder.setMessage(address.getAddressLine(0));
+                                        dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // Do something when user clicked the Yes button
+                                                destionationLatLng = latLng;
+                                                setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
+                                                mMap.addCircle(new CircleOptions()
+                                                        .center(destionationLatLng)
+                                                        .strokeColor(Color.argb(100, 98, 0, 238))
+                                                        .fillColor(Color.argb(50, 98, 0, 238))
+                                                        .radius(300f));
 
-                                // Maybe here is where you do the notification.
-                            }
-                        });
+                                                // Maybe here is where you do the notification.
+                                            }
+                                        });
 
-                        // Set the alert dialog no button click listener
-                        dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Do something when No button clicked
-                                Toast.makeText(getApplicationContext(),
-                                        "You selected No, please search again.",Toast.LENGTH_SHORT).show();
-                            }
-                        });
 
-                        AlertDialog dialog = dialogbuilder.create();
-                        // Display the alert dialog on interface
-                        dialog.show();
+                                        // Set the alert dialog no button click listener
+                                        dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // Do something when No button clicked
+                                                Toast.makeText(getApplicationContext(),
+                                                        "You selected No, please search again.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                        AlertDialog dialog = dialogbuilder.create();
+                                        // Display the alert dialog on interface
+                                        dialog.show();
+                                    }
+                                },
+                                800);
 
 
                     } catch (IOException e) {
