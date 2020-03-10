@@ -192,6 +192,8 @@ public class MapActivity extends AppCompatActivity
                                                             .radius(300f));
 
                                                     // Maybe here is where you do the notification.
+
+
                                                 }
                                             });
 
@@ -398,6 +400,7 @@ public class MapActivity extends AppCompatActivity
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
+
             mLocationPermissionGranted = true;
         } else {
             ActivityCompat.requestPermissions(this,
@@ -461,6 +464,7 @@ public class MapActivity extends AppCompatActivity
 
         // creating a request using the geofence we created in previous code block
         GeofencingRequest geofencingRequest = getGeofencingRequest(geofence);
+
 
         // create an intent and set it to be a pending intent.
         Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
