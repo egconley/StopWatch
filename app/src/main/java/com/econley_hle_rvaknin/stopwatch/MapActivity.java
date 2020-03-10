@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -69,6 +70,7 @@ public class MapActivity extends AppCompatActivity
     // Search stuff
     private SupportMapFragment mapFragment;
     SearchView searchView;
+    LatLng destionationLatLng;
     ///////////////////////////////////////////////////////////////
 
 
@@ -116,6 +118,14 @@ public class MapActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(Marker marker) {
+//                System.out.println("THIS IS THE MARKER INFO AFTER CLICKED"+marker.toString());
+//                return false;
+//            }
+//        });
     }
     /**
      * Saves the state of the map when the activity is paused.
@@ -147,27 +157,82 @@ public class MapActivity extends AppCompatActivity
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     String location = searchView.getQuery().toString();
-                    List<Address> destination = null;
+//                    List<Address> destination = null;
                     Log.i("haitle16.MapActivity", "getting into into into  searchView");
                     Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+
                     try {
-                        destination = geocoder.getFromLocationName(location, 1);
-                        Address address = destination.get(0);
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(location));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-                        Log.i("haitle16.MapActivity", "Data from latLng" + latLng);
-                        Log.i("haitle16.MapActivity", "Data from address" + address);
+                        List<Address> destination = geocoder.getFromLocationName(location, 1);
+                        Log.i("haitle16.MapActivity", "address object is empty?: " + destination.isEmpty());
+                        if(!destination.isEmpty()) {
+                            final Address address = destination.get(0);
+                            final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+//                            destionationLatLng = latLng;
+                            mMap.clear();
+                            mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                            Log.i("haitle16.MapActivity", "Data from latLng" + latLng);
+                            Log.i("haitle16.MapActivity", "Data from address" + address);
+                            // MAYBE SET THE ONMARKERLISTENER mMAP HERE BUT FIND MORE EFFICIENT PLACE
+                            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                @Override
+                                public boolean onMarkerClick(Marker marker) {
+                                    System.out.println("THIS IS THE MARKER INFO AFTER CLICKED lat: " + marker.getPosition().latitude + " | long: " + marker.getPosition().longitude);
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                                    builder.setTitle("Select your answer");
+                                    builder.setMessage("Are you sure you want to set " + address.getAddressLine(0) + " as your destination?");
+                                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Do something when user clicked the Yes button
+                                            // Set the TextView visibility GONE
+//                                            tv.setVisibility(View.GONE);
+                                            destionationLatLng = latLng;
+
+                                            // Maybe here is where you do the notification. 
+                                        }
+                                    });
+
+                                    // Set the alert dialog no button click listener
+                                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Do something when No button clicked
+                                            Toast.makeText(getApplicationContext(),
+                                                    "You selected No, please search again.",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+                                    AlertDialog dialog = builder.create();
+                                    // Display the alert dialog on interface
+                                    dialog.show();
+
+                                    return false;
+                                }
+                            });
+                        }
+                        else {
+                            // else reload page with search clicked
+                            Log.i("haitle16.MapActivity", "ERROR SOME KIND");
+                            finish();
+                            Toast toast = Toast.makeText(MapActivity.this,
+                                    "Search location is invalid, please specify location name and state!",
+                                    Toast.LENGTH_LONG);
+                            toast.show();
+                            startActivity(getIntent());
+
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
-                    // lat and long is under address.lat,long
-                    return false;
+                    return true;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String query) {
+
                     return false;
                 }
             });
