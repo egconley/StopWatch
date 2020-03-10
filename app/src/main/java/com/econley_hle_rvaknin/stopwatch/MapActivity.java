@@ -176,6 +176,34 @@ public class MapActivity extends AppCompatActivity
                             LatLngBounds bounds = builder.build();
                             mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
                             searchView.onActionViewCollapsed();
+//                            Thread.currentThread().sleep(1000);
+                            AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
+                            dialogbuilder.setTitle("Set destination?");
+                            dialogbuilder.setMessage(address.getAddressLine(0));
+                            dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Do something when user clicked the Yes button
+                                    destionationLatLng = latLng;
+
+                                    // Maybe here is where you do the notification.
+                                }
+                            });
+
+                            // Set the alert dialog no button click listener
+                            dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Do something when No button clicked
+                                    Toast.makeText(getApplicationContext(),
+                                            "You selected No, please search again.",Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            AlertDialog dialog = dialogbuilder.create();
+                            // Display the alert dialog on interface
+                            dialog.show();
+
 
 
 
@@ -184,40 +212,40 @@ public class MapActivity extends AppCompatActivity
                             Log.i("haitle16.MapActivity", "Data from latLng" + latLng);
                             Log.i("haitle16.MapActivity", "Data from address" + address);
                             // MAYBE SET THE ONMARKERLISTENER mMAP HERE BUT FIND MORE EFFICIENT PLACE
-                            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                                @Override
-                                public boolean onMarkerClick(Marker marker) {
-                                    System.out.println("THIS IS THE MARKER INFO AFTER CLICKED lat: " + marker.getPosition().latitude + " | long: " + marker.getPosition().longitude);
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
-                                    builder.setTitle("Select your answer");
-                                    builder.setMessage("Are you sure you want to set " + address.getAddressLine(0) + " as your destination?");
-                                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            // Do something when user clicked the Yes button
-                                            destionationLatLng = latLng;
-
-                                            // Maybe here is where you do the notification.
-                                        }
-                                    });
-
-                                    // Set the alert dialog no button click listener
-                                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            // Do something when No button clicked
-                                            Toast.makeText(getApplicationContext(),
-                                                    "You selected No, please search again.",Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-
-                                    AlertDialog dialog = builder.create();
-                                    // Display the alert dialog on interface
-                                    dialog.show();
-
-                                    return false;
-                                }
-                            });
+//                            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//                                @Override
+//                                public boolean onMarkerClick(Marker marker) {
+//                                    System.out.println("THIS IS THE MARKER INFO AFTER CLICKED lat: " + marker.getPosition().latitude + " | long: " + marker.getPosition().longitude);
+//                                    AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+//                                    builder.setTitle("Select your answer");
+//                                    builder.setMessage("Are you sure you want to set " + address.getAddressLine(0) + " as your destination?");
+//                                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(DialogInterface dialog, int which) {
+//                                            // Do something when user clicked the Yes button
+//                                            destionationLatLng = latLng;
+//
+//                                            // Maybe here is where you do the notification.
+//                                        }
+//                                    });
+//
+//                                    // Set the alert dialog no button click listener
+//                                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(DialogInterface dialog, int which) {
+//                                            // Do something when No button clicked
+//                                            Toast.makeText(getApplicationContext(),
+//                                                    "You selected No, please search again.",Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    });
+//
+//                                    AlertDialog dialog = builder.create();
+//                                    // Display the alert dialog on interface
+//                                    dialog.show();
+//
+//                                    return false;
+//                                }
+//                            });
                         }
                         else {
                             // else reload page with search clicked
