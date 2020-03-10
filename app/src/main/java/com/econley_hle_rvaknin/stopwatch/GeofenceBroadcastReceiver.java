@@ -1,9 +1,13 @@
 package com.econley_hle_rvaknin.stopwatch;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
@@ -13,7 +17,9 @@ import java.util.List;
 
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     // ...
+
      public void onReceive(Context context, Intent intent) {
+
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         if (geofencingEvent.hasError()) {
             String errorMessage = GeofenceStatusCodes.getStatusCodeString(geofencingEvent.getErrorCode());
@@ -30,8 +36,9 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
             Log.e("ehr", "ENTERED THE DANGER ZONEEEEE");
 
-            // notification logic goes here <<< -----
-
+            // Send Notification
+            MapActivity map = new MapActivity();
+            map.sendNotification();
 
         } else {
             // Log the error.

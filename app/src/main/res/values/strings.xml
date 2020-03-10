@@ -8,5 +8,8 @@
     <string name="option_set_destination">Set destination</string>
     <string name="menu_searchbar">Search</string>
     <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
+    <string name="fcm_message" translatable="false">Stop Alert</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+
 <!--    Maybe put a get destination, after they dropped a pin then change that to set destination.-->
 </resources>
