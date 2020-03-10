@@ -29,6 +29,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER){
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
             Log.e("ehr", "ENTERED THE DANGER ZONEEEEE");
+            System.out.println("Welcome to the jungle!!!");
 
             // notification logic goes here <<< -----
 
