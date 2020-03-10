@@ -7,5 +7,6 @@
     <string name="option_get_place">Get place</string>
     <string name="option_set_destination">Set destination</string>
     <string name="menu_searchbar">Search</string>
+    <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
 <!--    Maybe put a get destination, after they dropped a pin then change that to set destination.-->
 </resources>
