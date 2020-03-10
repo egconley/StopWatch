@@ -149,7 +149,6 @@ public class MapActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.current_place_menu, menu);
         final MenuItem searchMenu = menu.findItem(R.id.menu_search);
-//        androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) MenuItemCompat.getActionView(searchMenu);
         searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
         Log.i("haitle16.MapActivity", "data from searchView: " + searchView);
         if (searchView != null) {
@@ -164,11 +163,8 @@ public class MapActivity extends AppCompatActivity
                         if(!destination.isEmpty()) {
                             final Address address = destination.get(0);
                             final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-//                            destionationLatLng = latLng;
                             mMap.clear();
-
                             mMap.addMarker(new MarkerOptions().position(latLng).title(location));
-
                             LatLngBounds.Builder builder = new LatLngBounds.Builder();
                             final LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
                             builder.include(currentlatLng); // get user's location
@@ -204,26 +200,16 @@ public class MapActivity extends AppCompatActivity
                             // Display the alert dialog on interface
                             dialog.show();
 
-
-
-
-
-//                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                             Log.i("haitle16.MapActivity", "Data from latLng" + latLng);
                             Log.i("haitle16.MapActivity", "Data from address" + address);
-                            // MAYBE SET THE ONMARKERLISTENER mMAP HERE BUT FIND MORE EFFICIENT PLACE
                         }
                         else {
                             // else reload page with search clicked
                             Log.i("haitle16.MapActivity", "ERROR SOME KIND");
-//                            finish();
-//                            searchView.setError()
                             Toast toast = Toast.makeText(MapActivity.this,
                                     "Search location is invalid, please specify location name and state!",
                                     Toast.LENGTH_LONG);
                             toast.show();
-
-//                            startActivity(getIntent());
 
                         }
                     } catch (IOException e) {
@@ -237,6 +223,57 @@ public class MapActivity extends AppCompatActivity
                 public boolean onQueryTextChange(String query) {
 
                     return false;
+                }
+            });
+
+
+            mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(final LatLng latLng) {
+                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+                    try {
+                        List<Address> destination = geocoder.getFromLocation(latLng.latitude, latLng.longitude,1);
+                        final Address address = destination.get(0);
+
+
+                        mMap.clear();
+
+                        mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(address)));
+                        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
+                        dialogbuilder.setTitle("Set destination?");
+                        dialogbuilder.setMessage(address.getAddressLine(0));
+                        dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do something when user clicked the Yes button
+                                destionationLatLng = latLng;
+
+                                // Maybe here is where you do the notification.
+                            }
+                        });
+
+                        // Set the alert dialog no button click listener
+                        dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do something when No button clicked
+                                Toast.makeText(getApplicationContext(),
+                                        "You selected No, please search again.",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        AlertDialog dialog = dialogbuilder.create();
+                        // Display the alert dialog on interface
+                        dialog.show();
+
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+
                 }
             });
         }
