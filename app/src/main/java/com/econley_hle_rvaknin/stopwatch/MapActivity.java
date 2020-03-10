@@ -1,10 +1,11 @@
 package com.econley_hle_rvaknin.stopwatch;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
 
 import android.app.PendingIntent;
 
@@ -13,6 +14,8 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,7 +39,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,49 +50,52 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class MapActivity extends AppCompatActivity
         implements OnMapReadyCallback {
-
     private static final String TAG = "egc." + MapActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
+
     private Geofence geofence;
 
     // The entry point to the Places API.
     private PlacesClient mPlacesClient;
+    // Search stuff
+    private SupportMapFragment mapFragment;
+    SearchView searchView;
+    ///////////////////////////////////////////////////////////////
+
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
-
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
-
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
-
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
-
     // Used for selecting the current place.
     private static final int M_MAX_ENTRIES = 5;
     private String[] mLikelyPlaceNames;
     private String[] mLikelyPlaceAddresses;
     private List[] mLikelyPlaceAttributions;
     private LatLng[] mLikelyPlaceLatLngs;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         setGeofence();
 
@@ -99,24 +104,19 @@ public class MapActivity extends AppCompatActivity
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
-
         // Retrieve the content view that renders the map.
         setContentView(R.layout.map_fragment);
-
         // Construct a PlacesClient
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         mPlacesClient = Places.createClient(this);
-
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
     /**
      * Saves the state of the map when the activity is paused.
      */
@@ -128,7 +128,6 @@ public class MapActivity extends AppCompatActivity
             super.onSaveInstanceState(outState);
         }
     }
-
     /**
      * Sets up the options menu.
      *
@@ -138,9 +137,43 @@ public class MapActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.current_place_menu, menu);
+        final MenuItem searchMenu = menu.findItem(R.id.menu_search);
+//        androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) MenuItemCompat.getActionView(searchMenu);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
+        Log.i("haitle16.MapActivity", "data from searchView: " + searchView);
+        if (searchView != null) {
+            Log.i("haitle16.MapActivity", "getting into searchView");
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    String location = searchView.getQuery().toString();
+                    List<Address> destination = null;
+                    Log.i("haitle16.MapActivity", "getting into into into  searchView");
+                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                    try {
+                        destination = geocoder.getFromLocationName(location, 1);
+                        Address address = destination.get(0);
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                        Log.i("haitle16.MapActivity", "Data from latLng" + latLng);
+                        Log.i("haitle16.MapActivity", "Data from address" + address);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    // lat and long is under address.lat,long
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String query) {
+                    return false;
+                }
+            });
+        }
         return true;
     }
-
     /**
      * Handles a click on the menu option to get a place.
      * @param item The menu item to handle.
@@ -153,7 +186,6 @@ public class MapActivity extends AppCompatActivity
 //        }
 //        return true;
 //    }
-
     /**
      * Manipulates the map when it's available.
      * The API invokes this callback when the map is ready to be used.
@@ -171,47 +203,36 @@ public class MapActivity extends AppCompatActivity
 //        googleMap.addMarker(new MarkerOptions().position(sydney)
 //                .title("Marker in Sydney"));
 //        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
         mMap = map;
-
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-
             @Override
             // Return null here, so that getInfoContents() is called next.
             public View getInfoWindow(Marker arg0) {
                 return null;
             }
-
             @Override
             public View getInfoContents(Marker marker) {
                 // Inflate the layouts for the info window, title and snippet.
                 View infoWindow = getLayoutInflater().inflate(R.layout.map_info_content,
                         (FrameLayout) findViewById(R.id.map), false);
-
                 TextView title = infoWindow.findViewById(R.id.title);
                 title.setText(marker.getTitle());
-
                 TextView snippet = infoWindow.findViewById(R.id.snippet);
                 snippet.setText(marker.getSnippet());
-
                 return infoWindow;
             }
         });
-
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
-
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
-
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
     }
-
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
@@ -247,7 +268,6 @@ public class MapActivity extends AppCompatActivity
             Log.e("Exception: %s", e.getMessage());
         }
     }
-
     /**
      * Prompts the user for permission to use the device location.
      */
@@ -267,7 +287,6 @@ public class MapActivity extends AppCompatActivity
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
-
     /**
      * Handles the result of the request for location permissions.
      */
@@ -287,7 +306,6 @@ public class MapActivity extends AppCompatActivity
         }
         updateLocationUI();
     }
-
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
      */

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:appcompat="http://schemas.android.com/tools">
 
     <group
         android:id="@+id/main_options_menu_group">
@@ -15,6 +16,4 @@
             android:title="@string/option_set_destination" />
 
     </group>
-
-
 </menu>
