@@ -38,6 +38,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -152,16 +153,11 @@ public class MapActivity extends AppCompatActivity
         searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
         Log.i("haitle16.MapActivity", "data from searchView: " + searchView);
         if (searchView != null) {
-            Log.i("haitle16.MapActivity", "getting into searchView");
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     String location = searchView.getQuery().toString();
-//                    List<Address> destination = null;
-                    Log.i("haitle16.MapActivity", "getting into into into  searchView");
                     Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-
-
                     try {
                         List<Address> destination = geocoder.getFromLocationName(location, 1);
                         Log.i("haitle16.MapActivity", "address object is empty?: " + destination.isEmpty());
@@ -170,8 +166,21 @@ public class MapActivity extends AppCompatActivity
                             final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
 //                            destionationLatLng = latLng;
                             mMap.clear();
+
                             mMap.addMarker(new MarkerOptions().position(latLng).title(location));
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+
+                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            final LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+                            builder.include(currentlatLng); // get user's location
+                            builder.include(latLng); // get marker's location and then zoom
+                            LatLngBounds bounds = builder.build();
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
+                            searchView.onActionViewCollapsed();
+
+
+
+
+//                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                             Log.i("haitle16.MapActivity", "Data from latLng" + latLng);
                             Log.i("haitle16.MapActivity", "Data from address" + address);
                             // MAYBE SET THE ONMARKERLISTENER mMAP HERE BUT FIND MORE EFFICIENT PLACE
@@ -186,11 +195,9 @@ public class MapActivity extends AppCompatActivity
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             // Do something when user clicked the Yes button
-                                            // Set the TextView visibility GONE
-//                                            tv.setVisibility(View.GONE);
                                             destionationLatLng = latLng;
 
-                                            // Maybe here is where you do the notification. 
+                                            // Maybe here is where you do the notification.
                                         }
                                     });
 
@@ -215,12 +222,14 @@ public class MapActivity extends AppCompatActivity
                         else {
                             // else reload page with search clicked
                             Log.i("haitle16.MapActivity", "ERROR SOME KIND");
-                            finish();
+//                            finish();
+//                            searchView.setError()
                             Toast toast = Toast.makeText(MapActivity.this,
                                     "Search location is invalid, please specify location name and state!",
                                     Toast.LENGTH_LONG);
                             toast.show();
-                            startActivity(getIntent());
+
+//                            startActivity(getIntent());
 
                         }
                     } catch (IOException e) {
