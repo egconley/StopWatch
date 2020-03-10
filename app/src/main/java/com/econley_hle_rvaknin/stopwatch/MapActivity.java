@@ -14,6 +14,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -37,6 +38,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -99,8 +101,6 @@ public class MapActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        setGeofence();
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -167,42 +167,55 @@ public class MapActivity extends AppCompatActivity
 //                            destionationLatLng = latLng;
                             mMap.clear();
 
-                            mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                            final Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(location));
 
                             LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                            final LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+                            LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
                             builder.include(currentlatLng); // get user's location
                             builder.include(latLng); // get marker's location and then zoom
                             LatLngBounds bounds = builder.build();
                             mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
                             searchView.onActionViewCollapsed();
-//                            Thread.currentThread().sleep(1000);
-                            AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
-                            dialogbuilder.setTitle("Set destination?");
-                            dialogbuilder.setMessage(address.getAddressLine(0));
-                            dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Do something when user clicked the Yes button
-                                    destionationLatLng = latLng;
+                            // set delay of 1 second for the map to zoom
+                            new android.os.Handler().postDelayed(
+                                    new Runnable() {
+                                        public void run() {
+                                            AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
+                                            dialogbuilder.setTitle("Set destination?");
+                                            dialogbuilder.setMessage(address.getAddressLine(0));
+                                            dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // Do something when user clicked the Yes button
+                                                    destionationLatLng = latLng;
+                                                    setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
+                                                    mMap.addCircle(new CircleOptions()
+                                                            .center(destionationLatLng)
+                                                            .strokeColor(Color.argb(100, 98, 0, 238))
+                                                            .fillColor(Color.argb(50, 98, 0, 238))
+                                                            .radius(300f));
 
-                                    // Maybe here is where you do the notification.
-                                }
-                            });
+                                                    // Maybe here is where you do the notification.
+                                                }
+                                            });
 
-                            // Set the alert dialog no button click listener
-                            dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Do something when No button clicked
-                                    Toast.makeText(getApplicationContext(),
-                                            "You selected No, please search again.",Toast.LENGTH_SHORT).show();
-                                }
-                            });
 
-                            AlertDialog dialog = dialogbuilder.create();
-                            // Display the alert dialog on interface
-                            dialog.show();
+                                            // Set the alert dialog no button click listener
+                                            dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // Do something when No button clicked
+                                                    Toast.makeText(getApplicationContext(),
+                                                            "You selected No, please search again.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                            AlertDialog dialog = dialogbuilder.create();
+                                            // Display the alert dialog on interface
+                                            dialog.show();
+                                        }
+                                    },
+                                    800);
 
 
 
@@ -397,14 +410,17 @@ public class MapActivity extends AppCompatActivity
     }
 
 
-    private void setGeofence() {
+    private void setGeofence(double targetLat, double targetLong) {
         //// creating a geofence with lat long and radius
         geofence = new Geofence.Builder()
                 .setRequestId("destination")
-                .setCircularRegion(47.621565, -122.350624, 100)
+                .setCircularRegion(targetLat, targetLong, 300)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                 .build();
+
+        System.out.println("targetLat = " + targetLat);
+        System.out.println("targetLong = " + targetLong);
 
         // creating a request using the geofence we created in previous code block
         GeofencingRequest geofencingRequest = getGeofencingRequest(geofence);
