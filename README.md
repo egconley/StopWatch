@@ -13,3 +13,5 @@ An Android app that alerts bus commuters when they are close to their stop.  See
 - Ellen Conley
 - Hai Le
 - Ran Vaknin
+
+// to test app generate google maps api key and notification key?
