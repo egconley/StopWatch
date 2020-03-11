@@ -108,7 +108,7 @@ public class MapActivity extends AppCompatActivity
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        
+
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

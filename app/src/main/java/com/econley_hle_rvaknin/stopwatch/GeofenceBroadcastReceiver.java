@@ -59,6 +59,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle("Approaching Stop!")
                 .setContentText("You are almost at your stop!")
+                .setVibrate(new long[]{300,300})
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
