@@ -567,7 +567,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // creating a request using the geofence we created in previous code block
         GeofencingRequest geofencingRequest = getGeofencingRequest(geofence);
 
-
         // create an intent and set it to be a pending intent.
         Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -584,6 +583,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d(TAG, "failed to add geofence :( ");
+                        Log.e("ehr ERROR",e.toString());
 
                     }
                 });
