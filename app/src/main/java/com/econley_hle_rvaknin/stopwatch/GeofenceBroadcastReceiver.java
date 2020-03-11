@@ -18,7 +18,10 @@ import java.util.List;
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     // ...
 
-     public void onReceive(Context context, Intent intent) {
+    private static boolean withinRadius = false;
+    static String CHANNEL_ID = "101";
+
+    public void onReceive(Context context, Intent intent) {
 
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         if (geofencingEvent.hasError()) {
@@ -35,14 +38,34 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER){
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
             Log.e("ehr", "ENTERED THE DANGER ZONEEEEE");
+            System.out.println("Welcome to the jungle!!!");
 
             // Send Notification
-            MapActivity map = new MapActivity();
-            map.sendNotification();
+            withinRadius=true;
+            sendNotification(context);
 
         } else {
             // Log the error.
             Log.e("ehr", "failed to enter geofence");
         }
     }
+
+    public void sendNotification(Context context) {
+        // Create an explicit intent for an Activity in your app
+        System.out.println("SEND NOTIFICATION CALLEDDDDD!!!!!!!");
+        Intent intent = new Intent(context, MapActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("Approaching Stop!")
+                .setContentText("You are almost at your stop!")
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+
+        notificationManager.notify((int)(Math.random() * 100.0), builder.build());
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.econley_hle_rvaknin.stopwatch;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.widget.SearchView;
@@ -8,8 +9,10 @@ import androidx.core.view.MenuItemCompat;
 
 import android.app.PendingIntent;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -32,7 +35,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -58,6 +63,9 @@ import androidx.core.app.NotificationManagerCompat;
 public class MapActivity extends AppCompatActivity
         implements OnMapReadyCallback {
     private static final String TAG = "egc." + MapActivity.class.getSimpleName();
+
+    private static MapActivity instance;
+
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
 
@@ -68,7 +76,7 @@ public class MapActivity extends AppCompatActivity
     // Search stuff
     private SupportMapFragment mapFragment;
     SearchView searchView;
-    ///////////////////////////////////////////////////////////////
+    LatLng destionationLatLng;
 
 
     // The entry point to the Fused Location Provider.
@@ -93,11 +101,10 @@ public class MapActivity extends AppCompatActivity
     private LatLng[] mLikelyPlaceLatLngs;
 
     static String CHANNEL_ID = "101";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setGeofence();
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -153,23 +160,29 @@ public class MapActivity extends AppCompatActivity
 //                        Toast.makeText(MapActivity.this, msg, Toast.LENGTH_LONG).show();
                     }
                 });
+
+//        boolean entryStatus = GeofenceBroadcastReceiver.getEntryStatus();
+//        if (entryStatus) {
+//            sendNotification();
+//            System.out.println("SUCCESSSSSSSS!!!!!!!");
+//        }
     }
 
-    public void sendNotification() {
-        // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(this, MapActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Remember to grow!")
-                .setContentText("Career growth matters!")
-                .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-        notificationManager.notify((int)(Math.random() * 100.0), builder.build());
-    }
+//    public void sendNotification() {
+//        // Create an explicit intent for an Activity in your app
+//        Intent intent = new Intent(this, MapActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+//                .setSmallIcon(R.drawable.ic_launcher_foreground)
+//                .setContentTitle("Remember to grow!")
+//                .setContentText("Career growth matters!")
+//                .setContentIntent(pendingIntent)
+//                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//
+//        notificationManager.notify((int)(Math.random() * 100.0), builder.build());
+//    }
 
     @Override
     protected void onResume() {
@@ -183,6 +196,7 @@ public class MapActivity extends AppCompatActivity
      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+
         if (mMap != null) {
             outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
@@ -199,37 +213,157 @@ public class MapActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.current_place_menu, menu);
         final MenuItem searchMenu = menu.findItem(R.id.menu_search);
-//        androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) MenuItemCompat.getActionView(searchMenu);
         searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
         Log.i("haitle16.MapActivity", "data from searchView: " + searchView);
         if (searchView != null) {
-            Log.i("haitle16.MapActivity", "getting into searchView");
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     String location = searchView.getQuery().toString();
-                    List<Address> destination = null;
-                    Log.i("haitle16.MapActivity", "getting into into into  searchView");
                     Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
                     try {
-                        destination = geocoder.getFromLocationName(location, 1);
-                        Address address = destination.get(0);
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(location));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-                        Log.i("haitle16.MapActivity", "Data from latLng" + latLng);
-                        Log.i("haitle16.MapActivity", "Data from address" + address);
+                        List<Address> destination = geocoder.getFromLocationName(location, 1);
+                        Log.i("haitle16.MapActivity", "address object is empty?: " + destination.isEmpty());
+                        if(!destination.isEmpty()) {
+                            final Address address = destination.get(0);
+                            final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                            mMap.clear();
+                            mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+                            builder.include(currentlatLng); // get user's location
+                            builder.include(latLng); // get marker's location and then zoom
+                            LatLngBounds bounds = builder.build();
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
+                            searchView.onActionViewCollapsed();
+                            // set delay of 1 second for the map to zoom
+                            new android.os.Handler().postDelayed(
+                                    new Runnable() {
+                                        public void run() {
+                                            AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
+                                            dialogbuilder.setTitle("Set destination?");
+                                            dialogbuilder.setMessage(address.getAddressLine(0));
+                                            dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // Do something when user clicked the Yes button
+                                                    destionationLatLng = latLng;
+                                                    setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
+                                                    mMap.addCircle(new CircleOptions()
+                                                            .center(destionationLatLng)
+                                                            .strokeColor(Color.argb(100, 98, 0, 238))
+                                                            .fillColor(Color.argb(50, 98, 0, 238))
+                                                            .radius(300f));
+
+                                                    // Maybe here is where you do the notification.
+                                                }
+                                            });
+
+
+                                            // Set the alert dialog no button click listener
+                                            dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // Do something when No button clicked
+                                                    Toast.makeText(getApplicationContext(),
+                                                            "You selected No, please search again.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                            AlertDialog dialog = dialogbuilder.create();
+                                            // Display the alert dialog on interface
+                                            dialog.show();
+                                        }
+                                    },
+                                    800);
+
+                            Log.i("haitle16.MapActivity", "Data from latLng" + latLng);
+                            Log.i("haitle16.MapActivity", "Data from address" + address);
+                        }
+                        else {
+                            // else reload page with search clicked
+                            Log.i("haitle16.MapActivity", "ERROR SOME KIND");
+                            Toast toast = Toast.makeText(MapActivity.this,
+                                    "Search location is invalid, please specify location name and state!",
+                                    Toast.LENGTH_LONG);
+                            toast.show();
+
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
-                    // lat and long is under address.lat,long
-                    return false;
+                    return true;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String query) {
+
                     return false;
+                }
+            });
+
+
+            mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(final LatLng latLng) {
+                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+                    try {
+                        List<Address> destination = geocoder.getFromLocation(latLng.latitude, latLng.longitude,1);
+                        final Address address = destination.get(0);
+
+
+                        mMap.clear();
+
+                        mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(address)));
+                        new android.os.Handler().postDelayed(
+                                new Runnable() {
+                                    public void run() {
+                                        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
+                                        dialogbuilder.setTitle("Set destination?");
+                                        dialogbuilder.setMessage(address.getAddressLine(0));
+                                        dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // Do something when user clicked the Yes button
+                                                destionationLatLng = latLng;
+                                                setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
+                                                mMap.addCircle(new CircleOptions()
+                                                        .center(destionationLatLng)
+                                                        .strokeColor(Color.argb(100, 98, 0, 238))
+                                                        .fillColor(Color.argb(50, 98, 0, 238))
+                                                        .radius(300f));
+
+                                                // Maybe here is where you do the notification.
+                                            }
+                                        });
+
+
+                                        // Set the alert dialog no button click listener
+                                        dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // Do something when No button clicked
+                                                Toast.makeText(getApplicationContext(),
+                                                        "You selected No, please search again.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                        AlertDialog dialog = dialogbuilder.create();
+                                        // Display the alert dialog on interface
+                                        dialog.show();
+                                    }
+                                },
+                                800);
+
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+
                 }
             });
         }
@@ -264,6 +398,7 @@ public class MapActivity extends AppCompatActivity
 //        googleMap.addMarker(new MarkerOptions().position(sydney)
 //                .title("Marker in Sydney"));
 //        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
         mMap = map;
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
@@ -311,6 +446,7 @@ public class MapActivity extends AppCompatActivity
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
+                            // send notification if entry status is true
                             if (mLastKnownLocation != null) {
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(),
                                         mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
@@ -391,14 +527,17 @@ public class MapActivity extends AppCompatActivity
     }
 
 
-    private void setGeofence() {
+    private void setGeofence(double targetLat, double targetLong) {
         //// creating a geofence with lat long and radius
         geofence = new Geofence.Builder()
                 .setRequestId("destination")
-                .setCircularRegion(47.621565, -122.350624, 100)
+                .setCircularRegion(targetLat, targetLong, 300)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                 .build();
+
+        System.out.println("targetLat = " + targetLat);
+        System.out.println("targetLong = " + targetLong);
 
         // creating a request using the geofence we created in previous code block
         GeofencingRequest geofencingRequest = getGeofencingRequest(geofence);
