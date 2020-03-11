@@ -45,7 +45,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
@@ -71,8 +70,6 @@ public class MapActivity extends AppCompatActivity
 
     private Geofence geofence;
 
-    // The entry point to the Places API.
-    private PlacesClient mPlacesClient;
     // Search stuff
     private SupportMapFragment mapFragment;
     SearchView searchView;
@@ -93,12 +90,7 @@ public class MapActivity extends AppCompatActivity
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
-    // Used for selecting the current place.
-    private static final int M_MAX_ENTRIES = 5;
-    private String[] mLikelyPlaceNames;
-    private String[] mLikelyPlaceAddresses;
-    private List[] mLikelyPlaceAttributions;
-    private LatLng[] mLikelyPlaceLatLngs;
+
 
     static String CHANNEL_ID = "101";
 
@@ -113,11 +105,10 @@ public class MapActivity extends AppCompatActivity
         }
         // Retrieve the content view that renders the map.
         setContentView(R.layout.map_fragment);
-        // Construct a PlacesClient
-        Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
-        mPlacesClient = Places.createClient(this);
+
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -160,29 +151,7 @@ public class MapActivity extends AppCompatActivity
 //                        Toast.makeText(MapActivity.this, msg, Toast.LENGTH_LONG).show();
                     }
                 });
-
-//        boolean entryStatus = GeofenceBroadcastReceiver.getEntryStatus();
-//        if (entryStatus) {
-//            sendNotification();
-//            System.out.println("SUCCESSSSSSSS!!!!!!!");
-//        }
     }
-
-//    public void sendNotification() {
-//        // Create an explicit intent for an Activity in your app
-//        Intent intent = new Intent(this, MapActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setSmallIcon(R.drawable.ic_launcher_foreground)
-//                .setContentTitle("Remember to grow!")
-//                .setContentText("Career growth matters!")
-//                .setContentIntent(pendingIntent)
-//                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-//
-//        notificationManager.notify((int)(Math.random() * 100.0), builder.build());
-//    }
 
     @Override
     protected void onResume() {
@@ -392,12 +361,6 @@ public class MapActivity extends AppCompatActivity
      */
     @Override
     public void onMapReady(GoogleMap map) {
-        // Add a marker in Sydney, Australia,
-        // and move the map's camera to the same location.
-//        LatLng sydney = new LatLng(-33.852, 151.211);
-//        googleMap.addMarker(new MarkerOptions().position(sydney)
-//                .title("Marker in Sydney"));
-//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
         mMap = map;
         // Use a custom info window adapter to handle multiple lines of text in the

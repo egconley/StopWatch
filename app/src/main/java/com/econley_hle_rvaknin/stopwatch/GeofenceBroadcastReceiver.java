@@ -16,7 +16,6 @@ import com.google.android.gms.location.GeofencingEvent;
 import java.util.List;
 
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
-    // ...
 
     private static boolean withinRadius = false;
     static String CHANNEL_ID = "101";
