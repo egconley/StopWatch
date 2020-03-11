@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "530359008983",
+    "firebase_url": "https://stopwatch-fe08c.firebaseio.com",
+    "project_id": "stopwatch-fe08c",
+    "storage_bucket": "stopwatch-fe08c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:530359008983:android:73875f707576694ca03a92",
+        "android_client_info": {
+          "package_name": "com.econley_hle_rvaknin.stopwatch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "530359008983-mfld4eb5rob4cng3d7ho2f571rjl9md9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.econley_hle_rvaknin.stopwatch",
+            "certificate_hash": "eec2eac72c0ef3a0d259197f071737048561b9b4"
+          }
+        },
+        {
+          "client_id": "530359008983-cmqltesg9k550dfclicr9umdtql0nu9s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrhv8aQazmL7paKC8Ua_ZfVk96tO8lyhg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "530359008983-cmqltesg9k550dfclicr9umdtql0nu9s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
