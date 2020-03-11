@@ -6,17 +6,22 @@ import androidx.core.app.ActivityCompat;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.PendingIntent;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,9 +52,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -59,8 +69,8 @@ import android.app.NotificationManager;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-public class MapActivity extends AppCompatActivity
-        implements OnMapReadyCallback {
+
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "egc." + MapActivity.class.getSimpleName();
 
     private static MapActivity instance;
@@ -70,6 +80,9 @@ public class MapActivity extends AppCompatActivity
 
     private Geofence geofence;
 
+    private RecyclerView recyclerView;
+    // The entry point to the Places API.
+    private PlacesClient mPlacesClient;
     // Search stuff
     private SupportMapFragment mapFragment;
     SearchView searchView;
@@ -81,6 +94,7 @@ public class MapActivity extends AppCompatActivity
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+    private LinkedList<String> recentDestinations;
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
@@ -98,6 +112,20 @@ public class MapActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        recyclerView = findViewById(R.id.recyclerView1);
+        recentDestinations = loadRecents();
+        MyAdapter myAdapter = new MyAdapter(this, recentDestinations);
+        if(recyclerView !=null ){
+        recyclerView.setAdapter(myAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        } else{
+            Log.e("rvrv","my adapter is nulll9999");
+        }
+
+        for(String value: recentDestinations){
+            System.out.println("value = " + value);
+        }
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -211,12 +239,14 @@ public class MapActivity extends AppCompatActivity
                                         public void run() {
                                             AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
                                             dialogbuilder.setTitle("Set destination?");
-                                            dialogbuilder.setMessage(address.getAddressLine(0));
+                                            final String destination = address.getAddressLine(0);
+                                            dialogbuilder.setMessage(destination);
                                             dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     // Do something when user clicked the Yes button
                                                     destionationLatLng = latLng;
+                                                    saveToRecents(destination);
                                                     setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
                                                     mMap.addCircle(new CircleOptions()
                                                             .center(destionationLatLng)
@@ -225,6 +255,8 @@ public class MapActivity extends AppCompatActivity
                                                             .radius(300f));
 
                                                     // Maybe here is where you do the notification.
+
+
                                                 }
                                             });
 
@@ -286,25 +318,52 @@ public class MapActivity extends AppCompatActivity
                         mMap.clear();
 
                         mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(address)));
+//                        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
+//                        dialogbuilder.setTitle("Set destination?");
+//                        dialogbuilder.setMessage(address.getAddressLine(0));
+//                        dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                // Do something when user clicked the Yes button
+//                                destionationLatLng = latLng;
+//
+//                                // Maybe here is where you do the notification.
+//                            }
+//                        });
+//
+//                        // Set the alert dialog no button click listener
+//                        dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                // Do something when No button clicked
+//                                passToGooglemap(latLng);
+//                                Toast.makeText(getApplicationContext(),
+//                                        "You selected No, please search again.",Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//
+//                        AlertDialog dialog = dialogbuilder.create();
+//                        // Display the alert dialog on interface
+//                        dialog.show();
                         new android.os.Handler().postDelayed(
                                 new Runnable() {
                                     public void run() {
                                         AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
                                         dialogbuilder.setTitle("Set destination?");
-                                        dialogbuilder.setMessage(address.getAddressLine(0));
+                                        final String destination = address.getAddressLine(0);
+                                        dialogbuilder.setMessage(destination);
                                         dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 // Do something when user clicked the Yes button
                                                 destionationLatLng = latLng;
+                                                saveToRecents(destination);
                                                 setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
                                                 mMap.addCircle(new CircleOptions()
                                                         .center(destionationLatLng)
                                                         .strokeColor(Color.argb(100, 98, 0, 238))
                                                         .fillColor(Color.argb(50, 98, 0, 238))
                                                         .radius(300f));
-
-                                                // Maybe here is where you do the notification.
                                             }
                                         });
 
@@ -318,6 +377,7 @@ public class MapActivity extends AppCompatActivity
                                                         "You selected No, please search again.", Toast.LENGTH_SHORT).show();
                                             }
                                         });
+
 
                                         AlertDialog dialog = dialogbuilder.create();
                                         // Display the alert dialog on interface
@@ -402,12 +462,13 @@ public class MapActivity extends AppCompatActivity
          */
         try {
             if (mLocationPermissionGranted) {
+                recentDestinations = new LinkedList<>();
                 Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
                 locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
+                            // Set the map's camera position to the current location of     the device.
                             mLastKnownLocation = task.getResult();
                             // send notification if entry status is true
                             if (mLastKnownLocation != null) {
@@ -441,6 +502,7 @@ public class MapActivity extends AppCompatActivity
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
+
             mLocationPermissionGranted = true;
         } else {
             ActivityCompat.requestPermissions(this,
@@ -521,6 +583,7 @@ public class MapActivity extends AppCompatActivity
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d(TAG, "failed to add geofence :( ");
+                        Log.e("ehr ERROR",e.toString());
 
                     }
                 });
@@ -553,5 +616,38 @@ public class MapActivity extends AppCompatActivity
                 });
     }
 
+    public void passToGooglemap(LatLng latLng) {
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr="+mLastKnownLocation.getLatitude()+","+mLastKnownLocation.getLongitude()+"&daddr="+latLng.latitude+","+latLng.longitude));
+        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+        Log.i("erh", "gotten into passToGooglemap");
+        startActivity(intent);
+    }
 
+
+
+    private void saveToRecents(String address){
+        recentDestinations.addFirst(address);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(recentDestinations);
+        editor.putString("recent destination list",json);
+        editor.apply();
+    }
+
+    private LinkedList<String> loadRecents() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("recent destination list", null);
+        Type type = new TypeToken<LinkedList<String>>() {}.getType();
+        recentDestinations = gson.fromJson(json, type);
+
+        if(recentDestinations == null){
+            recentDestinations = new LinkedList<>();
+        }
+
+        return recentDestinations;
+    }
+    
+    
 }
