@@ -75,13 +75,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     LatLng destionationLatLng;
     ///////////////////////////////////////////////////////////////
 
-
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+
     private LinkedList<String> recentDestinations;
+
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
@@ -101,8 +102,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        recyclerView = findViewById(R.id.recyclerView1);
         recentDestinations = loadRecents();
+        System.out.println("size " + recentDestinations.size());
+
+
+        recyclerView = findViewById(R.id.recyclerView1);
         MyAdapter myAdapter = new MyAdapter(this, recentDestinations);
         if(recyclerView !=null ){
         recyclerView.setAdapter(myAdapter);
@@ -111,9 +115,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Log.e("rvrv","my adapter is nulll9999");
         }
 
-        for(String value: recentDestinations){
-            System.out.println("value = " + value);
-        }
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -198,6 +199,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                     // Do something when user clicked the Yes button
                                                     destionationLatLng = latLng;
                                                     saveToRecents(destination);
+                                                    for(String value: recentDestinations){
+                                                        System.out.println("value = " + value);
+                                                    }
                                                     setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
                                                     mMap.addCircle(new CircleOptions()
                                                             .center(destionationLatLng)
@@ -280,6 +284,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                 // Do something when user clicked the Yes button
                                                 destionationLatLng = latLng;
                                                 saveToRecents(destination);
+                                                for(String value: recentDestinations){
+                                                    System.out.println("value = " + value);
+                                                }
                                                 setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
                                                 mMap.addCircle(new CircleOptions()
                                                         .center(destionationLatLng)
