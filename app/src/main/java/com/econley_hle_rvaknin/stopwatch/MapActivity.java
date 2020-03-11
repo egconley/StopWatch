@@ -18,6 +18,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -119,6 +120,8 @@ public class MapActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
 
 //        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 //            @Override
@@ -273,6 +276,7 @@ public class MapActivity extends AppCompatActivity
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // Do something when No button clicked
+                                passToGooglemap(latLng);
                                 Toast.makeText(getApplicationContext(),
                                         "You selected No, please search again.",Toast.LENGTH_SHORT).show();
                             }
@@ -512,6 +516,13 @@ public class MapActivity extends AppCompatActivity
                         Log.d(TAG, "Failed to remove geofences :( ");
                     }
                 });
+    }
+
+    public void passToGooglemap(LatLng latLng) {
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr="+mLastKnownLocation.getLatitude()+","+mLastKnownLocation.getLongitude()+"&daddr="+latLng.latitude+","+latLng.longitude));
+        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+        Log.i("erh", "gotten into passToGooglemap");
+        startActivity(intent);
     }
 
 
