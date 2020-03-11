@@ -5,6 +5,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
+    <!-- Main content -->
+
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -12,7 +14,11 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="63dp"
         tools:context="com.econley_hle_rvaknin.stopwatch.MapActivity" />
-    <!-- Main content -->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -22,5 +28,8 @@
         android:background="@color/colorPrimary"
         app:itemIconTint="@drawable/item_selected"
         app:itemTextColor="@drawable/item_selected"
-        app:menu="@menu/bottom_navbar" />
+        app:menu="@menu/bottom_navbar" >
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
 </FrameLayout>

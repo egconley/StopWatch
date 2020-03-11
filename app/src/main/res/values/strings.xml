@@ -7,5 +7,8 @@
     <string name="option_get_place">Get place</string>
     <string name="option_setting">Setting</string>
     <string name="menu_searchbar">Search</string>
-<!--    Maybe put a get destination, after they dropped a pin then change that to set destination.-->
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--    Maybe put a get destination, after they dropped a pin then change that to set destination.-->
 </resources>
