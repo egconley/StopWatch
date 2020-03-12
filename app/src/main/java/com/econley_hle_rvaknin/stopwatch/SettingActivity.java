@@ -19,11 +19,16 @@ public class SettingActivity extends AppCompatActivity {
         Log.i("haitle16.Setting", "Made it into setting page.");
 
         Switch guidanceSwitch = (Switch) findViewById(R.id.guidance_switch);
+        final SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        boolean guidanceState = storage.getBoolean("guidanceStatus", false);
+        if(guidanceState == true) {
+            guidanceSwitch.setChecked(true);
+        }
         guidanceSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 Log.v("Switch State=", ""+b);
-                SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 SharedPreferences.Editor editor = storage.edit();
                 editor.putBoolean("guidanceStatus", b);
                 editor.apply();
@@ -38,8 +43,6 @@ public class SettingActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT);
                     toast.show();
                 }
-
-
             }
         });
 
