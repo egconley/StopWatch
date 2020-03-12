@@ -514,23 +514,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.navigation_map:
-                        System.out.println("NAVIGATION MENU SELECTED");
-                        break;
-
-
+                        findViewById(R.id.map).bringToFront();
+                        return true;
                     case R.id.favorite_routes:
                         System.out.println("MENU FAVORITE SELECTED!!!");
-                        break;
-
-
+                        return false;
                     case R.id.recent_routes:
-                        System.out.println("MENU RECENT SELECTED!!!");
-                        break;
+                        findViewById(R.id.recyclerView1).bringToFront();
+                        return true;
 
 
                 }
 //                System.out.println("MENU ITEM SELECTED!!!");
-                return true;
+                return false;
             }
         });
     }
