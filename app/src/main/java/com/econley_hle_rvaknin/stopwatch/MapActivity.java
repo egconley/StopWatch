@@ -131,26 +131,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // Retrieve the content view that renders the map.
         setContentView(R.layout.map_fragment);
 
-        // Event listener for bottom navigation menu
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        // sets initial selected item to map
-        bottomNavigationView.setSelectedItemId(R.id.navigation_map);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.navigation_map:
-
-                    case R.id.favorite_routes:
-
-                    case R.id.recent_routes:
-
-                }
-                System.out.println("MENU ITEM SELECTED!!!");
-                return true;
-            }
-        });
-
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -160,42 +140,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //Create notification channel
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // THESE ARE USER FACING
-            // DO NOT MESS THIS UP
-            CharSequence name = "Channel";
-            String description = "description";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
+        bottomNavigationSetUp();
+        nofificationChannelSetup();
+        firebaseSetup();
 
-        // Firebase
-        // Make sure Google Play Services is compatible with Firebase
-        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "getInstanceId failed", task.getException());
-                            return;
-                        }
-
-                        // Get new Instance ID token
-                        String token = task.getResult().getToken();
-
-                        // Log and toast
-                        String msg = getString(R.string.msg_token_fmt, token);
-                        Log.d("INSTANCE ID", msg);
-//                        Toast.makeText(MapActivity.this, msg, Toast.LENGTH_LONG).show();
-                    }
-                });
     }
 
     @Override
@@ -645,9 +593,71 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return recentDestinations;
     }
 
+    private void bottomNavigationSetUp() {
+        // Event listener for bottom navigation menu
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        // sets initial selected item to map
+        bottomNavigationView.setSelectedItemId(R.id.navigation_map);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.navigation_map:
 
+                    case R.id.favorite_routes:
+
+                    case R.id.recent_routes:
+
+                }
+                System.out.println("MENU ITEM SELECTED!!!");
+                return true;
+            }
+        });
+    }
+
+    private void nofificationChannelSetup() {
+        //Create notification channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // THESE ARE USER FACING
+            // DO NOT MESS THIS UP
+            CharSequence name = "Channel";
+            String description = "description";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void firebaseSetup() {
+        // Firebase
+        // Make sure Google Play Services is compatible with Firebase
+        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+
+                        // Log and toast
+                        String msg = getString(R.string.msg_token_fmt, token);
+                        Log.d("INSTANCE ID", msg);
+//                        Toast.makeText(MapActivity.this, msg, Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+    
     @Override
     public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
-        
+
     }
 }
