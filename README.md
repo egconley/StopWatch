@@ -19,6 +19,15 @@ An Android app that alerts bus commuters when they are close to their stop.  See
 - 5. When your emulator started, go into location setting to enable `High Accuracy Setting`
 - 6. Lastly, run your StopWatch in your emulator
 
+## Application in running
+![](/assets/runningApp/HomeSS.png)
+![](/assets/runningApp/recent-tab.png)
+![](/assets/runningApp/search.png)
+![](/assets/runningApp/dialog.png)
+![](/assets/runningApp/geofence.png)
+![](/assets/runningApp/setting.png)
+
+
 
 ## Built With:
 - [Java](https://www.java.com/en/)
