@@ -10,5 +10,5 @@
     android:layout_marginRight="16dp"
     android:background="@color/colorPrimary"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".TaskFragment"
-    tools:listitem="@layout/fragment_taskfragment" />
+    tools:context=".bottomnavigation.RecentDestinationsFragment"
+    tools:listitem="@layout/fragment_nav_recent" />

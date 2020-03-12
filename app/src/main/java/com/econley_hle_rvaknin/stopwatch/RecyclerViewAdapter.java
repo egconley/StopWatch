@@ -3,11 +3,12 @@ package com.econley_hle_rvaknin.stopwatch;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.econley_hle_rvaknin.stopwatch.bottomnavigation.RecentDestinationsFragment;
 
 import java.util.LinkedList;
 
@@ -20,9 +21,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private final String TAG = "rvrv";
     private LinkedList<String> mValues;
-    private final TaskFragment.OnListFragmentInteractionListener mListener;
+    private final RecentDestinationsFragment.OnListFragmentInteractionListener mListener;
 
-    public RecyclerViewAdapter(LinkedList<String> items, TaskFragment.OnListFragmentInteractionListener listener) {
+    public RecyclerViewAdapter(LinkedList<String> items, RecentDestinationsFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }

@@ -1,4 +1,4 @@
-package com.econley_hle_rvaknin.stopwatch;
+package com.econley_hle_rvaknin.stopwatch.bottomnavigation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import com.econley_hle_rvaknin.stopwatch.R;
+import com.econley_hle_rvaknin.stopwatch.RecyclerViewAdapter;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -28,7 +30,7 @@ import java.util.LinkedList;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class TaskFragment extends Fragment {
+public class RecentDestinationsFragment extends Fragment {
     RecyclerView recyclerView;
 
 
@@ -44,13 +46,13 @@ public class TaskFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public TaskFragment() {
+    public RecentDestinationsFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static TaskFragment newInstance(int columnCount) {
-        TaskFragment fragment = new TaskFragment();
+    public static RecentDestinationsFragment newInstance(int columnCount) {
+        RecentDestinationsFragment fragment = new RecentDestinationsFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -72,7 +74,7 @@ public class TaskFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_taskfragment_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_recent_list, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
