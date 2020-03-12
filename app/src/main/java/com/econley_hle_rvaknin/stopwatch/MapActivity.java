@@ -342,6 +342,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         return true;
     }
+
     /**
      * Handles a click on the menu option to get a place.
      * @param item The menu item to handle.
@@ -655,7 +656,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                 });
     }
-    
+
     @Override
     public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
 

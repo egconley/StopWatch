@@ -3,14 +3,18 @@ package com.econley_hle_rvaknin.stopwatch;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.econley_hle_rvaknin.stopwatch.bottomnavigation.RecentDestinationsFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.LinkedList;
+import java.util.Locale;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link } and makes a call to the
@@ -46,6 +50,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.mView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Context context = v.getContext();
+                System.out.println("CLICKED ITEM FROM RECYCLER VIEW!!!!!" + mValues);
+                Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+
 //                Intent i = new Intent(context,TaskDetail.class).putExtra("Task",mValues.get(position).title())
 //                        .putExtra("TaskDetails",mValues.get(position).body());
 //                if(mValues.get(position).team().name() != null){
