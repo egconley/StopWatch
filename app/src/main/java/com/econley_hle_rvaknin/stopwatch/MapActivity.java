@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.PendingIntent;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -108,12 +109,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
+    private String mLastKnownDestination;
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
 
     static String CHANNEL_ID = "101";
+
+    // ELLEN STILL WORKING ON THIS PART
+    public static void start(Context context,
+                             String mLastKnownDestination,
+                             Location mLastKnownLocation) {
+        context.startActivity(makeIntent(context, mLastKnownDestination, mLastKnownLocation));
+    }
+
+    public static void start(Context context,
+                             String mLastKnownDestination) {
+        context.startActivity(makeIntent(context, mLastKnownDestination));
+    }
+
+    public static Intent makeIntent(Context context,
+                                    String destination) {
+        Intent myIntent = new Intent(context, MapActivity.class);
+        myIntent.putExtra("newDestination", destination);
+        return myIntent;
+    }
+
+    public static Intent makeIntent(Context context,
+                                    String destination,
+                                    Location mLastKnownLocation) {
+        Intent myIntent = new Intent(context, MapActivity.class);
+        myIntent.putExtra("newDestination", destination);
+        return myIntent;
+    }
+    // ^ELLEN STILL WORKING ON THIS PART
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,36 +225,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     String location = searchView.getQuery().toString();
-                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                    try {
-                        List<Address> destination = geocoder.getFromLocationName(location, 1);
-                        Log.i("haitle16.MapActivity", "address object is empty?: " + destination.isEmpty());
-                        if(!destination.isEmpty()) {
-                            final Address address = destination.get(0);
-                            selectedAddress = address;
-                            final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                            mMap.clear();
-                            mMap.addMarker(new MarkerOptions().position(latLng).title(location));
-                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                            LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
-                            builder.include(currentlatLng); // get user's location
-                            builder.include(latLng); // get marker's location and then zoom
-                            LatLngBounds bounds = builder.build();
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
-                            searchView.onActionViewCollapsed();
-                            userDialog();
-                        }
-                        else {
-                            // else reload page with search clicked
-                            Toast toast = Toast.makeText(MapActivity.this,
-                                    "Search location is invalid, please specify location name and state!",
-                                    Toast.LENGTH_LONG);
-                            toast.show();
 
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    setDestination(getApplicationContext(), location);
+
+                    // Pulled the commented out code into setDestination(), declared on 591
+
+//                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+//                    try {
+//                        List<Address> destination = geocoder.getFromLocationName(location, 1);
+//                        Log.i("haitle16.MapActivity", "address object is empty?: " + destination.isEmpty());
+//                        if(!destination.isEmpty()) {
+//                            final Address address = destination.get(0);
+////                            selectedAddress = address;
+//                            final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+//                            mMap.clear();
+//                            mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+//                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+//                            LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+//                            builder.include(currentlatLng); // get user's location
+//                            builder.include(latLng); // get marker's location and then zoom
+//                            LatLngBounds bounds = builder.build();
+//                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
+//                            searchView.onActionViewCollapsed();
+//                            userDialog(address);
+//                        }
+//                        else {
+//                            // else reload page with search clicked
+//                            Toast toast = Toast.makeText(MapActivity.this,
+//                                    "Search location is invalid, please specify location name and state!",
+//                                    Toast.LENGTH_LONG);
+//                            toast.show();
+//
+//                        }
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
                     return true;
                 }
 
@@ -245,7 +280,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         final Address address = destination.get(0);
                         mMap.clear();
                         mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(address)));
-                        userDialog();
+                        userDialog(address);
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -256,6 +291,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         return true;
     }
+
     /**
      * Handles a click on the menu option to get a place.
      * @param item The menu item to handle.
@@ -574,13 +610,49 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                 });
     }
-    
+
     @Override
     public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
 
     }
 
-    public void userDialog() {
+    public void setDestination(Context context, String location) {
+        mLastKnownDestination = location;
+        Context appContext = getApplicationContext();
+        Geocoder geocoder = new Geocoder(appContext, Locale.getDefault());
+        try {
+            List<Address> destination = geocoder.getFromLocationName(location, 1);
+            Log.i("haitle16.MapActivity", "address object is empty?: " + destination.isEmpty());
+            if(!destination.isEmpty()) {
+                final Address address = destination.get(0);
+//                            selectedAddress = address;
+                final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+                builder.include(currentlatLng); // get user's location
+                builder.include(latLng); // get marker's location and then zoom
+                LatLngBounds bounds = builder.build();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
+                searchView.onActionViewCollapsed();
+                userDialog(address);
+            }
+            else {
+                // else reload page with search clicked
+                Toast toast = Toast.makeText(MapActivity.this,
+                        "Search location is invalid, please specify location name and state!",
+                        Toast.LENGTH_LONG);
+                toast.show();
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void userDialog(Address address) {
+        final Address selectedAddress = address;
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
