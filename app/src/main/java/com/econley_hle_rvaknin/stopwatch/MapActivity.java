@@ -80,7 +80,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private Geofence geofence;
 
-    private RecyclerView recyclerView;
     // The entry point to the Places API.
     private PlacesClient mPlacesClient;
     // Search stuff
@@ -88,13 +87,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     SearchView searchView;
     LatLng destionationLatLng;
 
-
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+
     private LinkedList<String> recentDestinations;
+
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
@@ -112,20 +112,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        recyclerView = findViewById(R.id.recyclerView1);
         recentDestinations = loadRecents();
-        MyAdapter myAdapter = new MyAdapter(this, recentDestinations);
-        if(recyclerView !=null ){
-        recyclerView.setAdapter(myAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        } else{
-            Log.e("rvrv","my adapter is nulll9999");
-        }
+        System.out.println("size " + recentDestinations.size());
 
         for(String value: recentDestinations){
             System.out.println("value = " + value);
         }
+
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -246,7 +239,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     // Do something when user clicked the Yes button
                                                     destionationLatLng = latLng;
+                                                    recentDestinations = loadRecents();
                                                     saveToRecents(destination);
+
                                                     setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
                                                     mMap.addCircle(new CircleOptions()
                                                             .center(destionationLatLng)
@@ -267,7 +262,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     // Do something when No button clicked
                                                     Toast.makeText(getApplicationContext(),
-                                                            "You selected No, please search again.", Toast.LENGTH_SHORT).show();
+                                                            "You selected No, please search again.", Toast.LENGTH_LONG).show();
                                                 }
                                             });
 
@@ -318,33 +313,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         mMap.clear();
 
                         mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(address)));
-//                        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
-//                        dialogbuilder.setTitle("Set destination?");
-//                        dialogbuilder.setMessage(address.getAddressLine(0));
-//                        dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                // Do something when user clicked the Yes button
-//                                destionationLatLng = latLng;
-//
-//                                // Maybe here is where you do the notification.
-//                            }
-//                        });
-//
-//                        // Set the alert dialog no button click listener
-//                        dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                // Do something when No button clicked
-//                                passToGooglemap(latLng);
-//                                Toast.makeText(getApplicationContext(),
-//                                        "You selected No, please search again.",Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
-//
-//                        AlertDialog dialog = dialogbuilder.create();
-//                        // Display the alert dialog on interface
-//                        dialog.show();
                         new android.os.Handler().postDelayed(
                                 new Runnable() {
                                     public void run() {
@@ -357,7 +325,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                             public void onClick(DialogInterface dialog, int which) {
                                                 // Do something when user clicked the Yes button
                                                 destionationLatLng = latLng;
+                                                recentDestinations = loadRecents();
                                                 saveToRecents(destination);
+                                                for(String value: recentDestinations){
+                                                    System.out.println("value = " + value);
+                                                }
                                                 setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
                                                 mMap.addCircle(new CircleOptions()
                                                         .center(destionationLatLng)
@@ -374,7 +346,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                             public void onClick(DialogInterface dialog, int which) {
                                                 // Do something when No button clicked
                                                 Toast.makeText(getApplicationContext(),
-                                                        "You selected No, please search again.", Toast.LENGTH_SHORT).show();
+                                                        "You selected No, please search again.", Toast.LENGTH_LONG).show();
                                             }
                                         });
 

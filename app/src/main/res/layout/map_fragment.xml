@@ -15,10 +15,11 @@
         android:layout_marginBottom="63dp"
         tools:context="com.econley_hle_rvaknin.stopwatch.MapActivity" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <fragment
         android:id="@+id/recyclerView1"
+        android:name="com.econley_hle_rvaknin.stopwatch.TaskFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="669dp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
