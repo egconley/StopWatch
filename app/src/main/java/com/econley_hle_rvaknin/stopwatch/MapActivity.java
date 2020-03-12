@@ -92,6 +92,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     SearchView searchView;
     LatLng destionationLatLng;
 
+    private RecyclerView recyclerView;
+
+
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
     // A default location (Sydney, Australia) and default zoom to use when location permission is
@@ -114,10 +117,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     static String CHANNEL_ID = "101";
 
-    //////// working on it
-    /// mLastKnownLocation
-    ///// mLastKnownDestination
-
+    // ELLEN STILL WORKING ON THIS PART
     public static void start(Context context,
                              String mLastKnownDestination,
                              Location mLastKnownLocation) {
@@ -143,6 +143,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         myIntent.putExtra("newDestination", destination);
         return myIntent;
     }
+    // ^ELLEN STILL WORKING ON THIS PART
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -552,23 +553,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.navigation_map:
-                        System.out.println("NAVIGATION MENU SELECTED");
-                        break;
-
-
+                        findViewById(R.id.map).bringToFront();
+                        return true;
                     case R.id.favorite_routes:
                         System.out.println("MENU FAVORITE SELECTED!!!");
-                        break;
-
-
+                        return false;
                     case R.id.recent_routes:
-                        System.out.println("MENU RECENT SELECTED!!!");
-                        break;
+                        findViewById(R.id.recyclerView1).bringToFront();
+                        return true;
 
 
                 }
 //                System.out.println("MENU ITEM SELECTED!!!");
-                return true;
+                return false;
             }
         });
     }
