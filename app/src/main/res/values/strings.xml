@@ -11,9 +11,11 @@
     <string name="fcm_message" translatable="false">Stop Alert</string>
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 
-<!--    Maybe put a get destination, after they dropped a pin then change that to set destination.-->
+    <!--    Maybe put a get destination, after they dropped a pin then change that to set destination.-->
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="setting">Setting</string>
+    <string name="transit_guidance_mode">TRANSIT GUIDANCE MODE</string>
     <!--    Maybe put a get destination, after they dropped a pin then change that to set destination.-->
 </resources>

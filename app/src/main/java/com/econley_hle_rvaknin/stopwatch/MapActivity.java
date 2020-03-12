@@ -49,7 +49,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -66,8 +65,6 @@ import java.util.Locale;
 import android.os.Build;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -210,12 +207,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.current_place_menu, menu);
         final MenuItem searchMenu = menu.findItem(R.id.menu_search);
+        final MenuItem settingMenu = menu.findItem(R.id.settingMenu);
+        settingMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem MenuItem) {
+                Intent tosettingpage = new Intent(MapActivity.this, SettingActivity.class);
+                startActivity(tosettingpage);
+                return false;
+            }
+        });
+
         searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
         Log.i("haitle16.MapActivity", "data from searchView: " + searchView);
         if (searchView != null) {
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
+
+
                     String location = searchView.getQuery().toString();
                     Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
                     try {
@@ -253,7 +262,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                             .strokeColor(Color.argb(100, 98, 0, 238))
                                                             .fillColor(Color.argb(50, 98, 0, 238))
                                                             .radius(300f));
+                                                    SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
+                                                    Boolean userGuidanceMode = storage.getBoolean("guidanceStatus",false);
+                                                    if(userGuidanceMode == true) {
+                                                        passToGooglemap(latLng);
+                                                    }
                                                     // Maybe here is where you do the notification.
 
 
@@ -266,6 +280,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     // Do something when No button clicked
+//                                                    passToGooglemap(latLng);
                                                     Toast.makeText(getApplicationContext(),
                                                             "You selected No, please search again.", Toast.LENGTH_SHORT).show();
                                                 }
@@ -309,42 +324,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 @Override
                 public void onMapLongClick(final LatLng latLng) {
                     Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-
                     try {
                         List<Address> destination = geocoder.getFromLocation(latLng.latitude, latLng.longitude,1);
                         final Address address = destination.get(0);
-
-
                         mMap.clear();
-
                         mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(address)));
-//                        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
-//                        dialogbuilder.setTitle("Set destination?");
-//                        dialogbuilder.setMessage(address.getAddressLine(0));
-//                        dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                // Do something when user clicked the Yes button
-//                                destionationLatLng = latLng;
-//
-//                                // Maybe here is where you do the notification.
-//                            }
-//                        });
-//
-//                        // Set the alert dialog no button click listener
-//                        dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                // Do something when No button clicked
-//                                passToGooglemap(latLng);
-//                                Toast.makeText(getApplicationContext(),
-//                                        "You selected No, please search again.",Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
-//
-//                        AlertDialog dialog = dialogbuilder.create();
-//                        // Display the alert dialog on interface
-//                        dialog.show();
                         new android.os.Handler().postDelayed(
                                 new Runnable() {
                                     public void run() {
@@ -364,21 +348,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                         .strokeColor(Color.argb(100, 98, 0, 238))
                                                         .fillColor(Color.argb(50, 98, 0, 238))
                                                         .radius(300f));
+                                                SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+                                                Boolean userGuidanceMode = storage.getBoolean("guidanceStatus",false);
+                                                if(userGuidanceMode == true) {
+                                                    passToGooglemap(latLng);
+                                                }
                                             }
                                         });
-
-
                                         // Set the alert dialog no button click listener
                                         dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 // Do something when No button clicked
+//                                                passToGooglemap(latLng);
                                                 Toast.makeText(getApplicationContext(),
                                                         "You selected No, please search again.", Toast.LENGTH_SHORT).show();
                                             }
                                         });
-
-
                                         AlertDialog dialog = dialogbuilder.create();
                                         // Display the alert dialog on interface
                                         dialog.show();
@@ -386,12 +373,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 },
                                 800);
 
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-
 
                 }
             });
