@@ -1,4 +1,5 @@
 package com.econley_hle_rvaknin.stopwatch;
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,6 +51,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -70,10 +73,11 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, BottomNavigationView.OnNavigationItemReselectedListener {
     private static final String TAG = "egc." + MapActivity.class.getSimpleName();
 
     private static MapActivity instance;
+    BottomNavigationView bottomNavigationView;
 
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
@@ -126,6 +130,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         // Retrieve the content view that renders the map.
         setContentView(R.layout.map_fragment);
+
+        // Event listener for bottom navigation menu
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        // sets initial selected item to map
+        bottomNavigationView.setSelectedItemId(R.id.navigation_map);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.navigation_map:
+
+                    case R.id.favorite_routes:
+
+                    case R.id.recent_routes:
+
+                }
+                System.out.println("MENU ITEM SELECTED!!!");
+                return true;
+            }
+        });
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -620,6 +644,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         return recentDestinations;
     }
-    
-    
+
+
+    @Override
+    public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
+        
+    }
 }
