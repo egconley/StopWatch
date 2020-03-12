@@ -2,7 +2,9 @@ package com.econley_hle_rvaknin.stopwatch;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.view.LayoutInflater;
@@ -11,9 +13,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.econley_hle_rvaknin.stopwatch.bottomnavigation.RecentDestinationsFragment;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -52,6 +59,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 Context context = v.getContext();
                 System.out.println("CLICKED ITEM FROM RECYCLER VIEW!!!!!" + mValues);
                 Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+                String location = mValues.getFirst();
+                System.out.println("LOCATION: " + location);
+                Intent intent = new Intent(context, MapActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+
+
+
+                // Want to call setDestination from MapActivity here
+
+
 
 //                Intent i = new Intent(context,TaskDetail.class).putExtra("Task",mValues.get(position).title())
 //                        .putExtra("TaskDetails",mValues.get(position).body());
