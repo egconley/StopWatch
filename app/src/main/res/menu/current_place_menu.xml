@@ -11,7 +11,7 @@
             app:showAsAction="always"
             app:actionViewClass="androidx.appcompat.widget.SearchView" />
         <item
-            android:id="@+id/option_get_place"
+            android:id="@+id/settingMenu"
             android:title="@string/option_setting" />
 
     </group>

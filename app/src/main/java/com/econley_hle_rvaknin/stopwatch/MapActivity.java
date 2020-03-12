@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.PendingIntent;
 
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +19,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -30,6 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
@@ -49,6 +50,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -60,20 +63,29 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import android.os.Build;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
+
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "egc." + MapActivity.class.getSimpleName();
+
+    private static MapActivity instance;
+
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
 
     private Geofence geofence;
-    private RecyclerView recyclerView;
+
     // The entry point to the Places API.
     private PlacesClient mPlacesClient;
     // Search stuff
     private SupportMapFragment mapFragment;
     SearchView searchView;
     LatLng destionationLatLng;
-    ///////////////////////////////////////////////////////////////
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -92,12 +104,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
-    // Used for selecting the current place.
-    private static final int M_MAX_ENTRIES = 5;
-    private String[] mLikelyPlaceNames;
-    private String[] mLikelyPlaceAddresses;
-    private List[] mLikelyPlaceAttributions;
-    private LatLng[] mLikelyPlaceLatLngs;
+
+
+    static String CHANNEL_ID = "101";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,14 +115,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         recentDestinations = loadRecents();
         System.out.println("size " + recentDestinations.size());
 
-
-        recyclerView = findViewById(R.id.recyclerView1);
-        MyAdapter myAdapter = new MyAdapter(this, recentDestinations);
-        if(recyclerView !=null ){
-        recyclerView.setAdapter(myAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        } else{
-            Log.e("rvrv","my adapter is nulll9999");
+        for(String value: recentDestinations){
+            System.out.println("value = " + value);
         }
 
         // Retrieve location and camera position from saved instance state.
@@ -122,30 +126,67 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         // Retrieve the content view that renders the map.
         setContentView(R.layout.map_fragment);
-        // Construct a PlacesClient
-        Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
-        mPlacesClient = Places.createClient(this);
+
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//            @Override
-//            public boolean onMarkerClick(Marker marker) {
-//                System.out.println("THIS IS THE MARKER INFO AFTER CLICKED"+marker.toString());
-//                return false;
-//            }
-//        });
+        //Create notification channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // THESE ARE USER FACING
+            // DO NOT MESS THIS UP
+            CharSequence name = "Channel";
+            String description = "description";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        // Firebase
+        // Make sure Google Play Services is compatible with Firebase
+        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+
+                        // Log and toast
+                        String msg = getString(R.string.msg_token_fmt, token);
+                        Log.d("INSTANCE ID", msg);
+//                        Toast.makeText(MapActivity.this, msg, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Make sure Google Play Services is compatible with Firebase
+        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
+    }
+
     /**
      * Saves the state of the map when the activity is paused.
      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+
         if (mMap != null) {
             outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
@@ -198,10 +239,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     // Do something when user clicked the Yes button
                                                     destionationLatLng = latLng;
+                                                    recentDestinations = loadRecents();
                                                     saveToRecents(destination);
-                                                    for(String value: recentDestinations){
-                                                        System.out.println("value = " + value);
-                                                    }
+
                                                     setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
                                                     mMap.addCircle(new CircleOptions()
                                                             .center(destionationLatLng)
@@ -210,6 +250,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                             .radius(300f));
 
                                                     // Maybe here is where you do the notification.
+
+
                                                 }
                                             });
 
@@ -220,7 +262,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     // Do something when No button clicked
                                                     Toast.makeText(getApplicationContext(),
-                                                            "You selected No, please search again.", Toast.LENGTH_SHORT).show();
+                                                            "You selected No, please search again.", Toast.LENGTH_LONG).show();
                                                 }
                                             });
 
@@ -283,6 +325,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                             public void onClick(DialogInterface dialog, int which) {
                                                 // Do something when user clicked the Yes button
                                                 destionationLatLng = latLng;
+                                                recentDestinations = loadRecents();
                                                 saveToRecents(destination);
                                                 for(String value: recentDestinations){
                                                     System.out.println("value = " + value);
@@ -293,8 +336,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                                         .strokeColor(Color.argb(100, 98, 0, 238))
                                                         .fillColor(Color.argb(50, 98, 0, 238))
                                                         .radius(300f));
-
-                                                // Maybe here is where you do the notification.
                                             }
                                         });
 
@@ -305,9 +346,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                             public void onClick(DialogInterface dialog, int which) {
                                                 // Do something when No button clicked
                                                 Toast.makeText(getApplicationContext(),
-                                                        "You selected No, please search again.", Toast.LENGTH_SHORT).show();
+                                                        "You selected No, please search again.", Toast.LENGTH_LONG).show();
                                             }
                                         });
+
 
                                         AlertDialog dialog = dialogbuilder.create();
                                         // Display the alert dialog on interface
@@ -351,12 +393,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap map) {
-        // Add a marker in Sydney, Australia,
-        // and move the map's camera to the same location.
-//        LatLng sydney = new LatLng(-33.852, 151.211);
-//        googleMap.addMarker(new MarkerOptions().position(sydney)
-//                .title("Marker in Sydney"));
-//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
         mMap = map;
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
@@ -405,6 +442,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of     the device.
                             mLastKnownLocation = task.getResult();
+                            // send notification if entry status is true
                             if (mLastKnownLocation != null) {
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(),
                                         mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
@@ -423,6 +461,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
     /**
      * Prompts the user for permission to use the device location.
      */
@@ -435,6 +474,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
+
             mLocationPermissionGranted = true;
         } else {
             ActivityCompat.requestPermissions(this,
@@ -515,6 +555,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d(TAG, "failed to add geofence :( ");
+                        Log.e("ehr ERROR",e.toString());
 
                     }
                 });
@@ -545,6 +586,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         Log.d(TAG, "Failed to remove geofences :( ");
                     }
                 });
+    }
+
+    public void passToGooglemap(LatLng latLng) {
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr="+mLastKnownLocation.getLatitude()+","+mLastKnownLocation.getLongitude()+"&daddr="+latLng.latitude+","+latLng.longitude));
+        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+        Log.i("erh", "gotten into passToGooglemap");
+        startActivity(intent);
     }
 
 
