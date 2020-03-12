@@ -106,12 +106,43 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
+    private String mLastKnownDestination;
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
 
     static String CHANNEL_ID = "101";
+
+    //////// working on it
+    /// mLastKnownLocation
+    ///// mLastKnownDestination
+
+    public static void start(Context context,
+                             String mLastKnownDestination,
+                             Location mLastKnownLocation) {
+        context.startActivity(makeIntent(context, mLastKnownDestination, mLastKnownLocation));
+    }
+
+    public static void start(Context context,
+                             String mLastKnownDestination) {
+        context.startActivity(makeIntent(context, mLastKnownDestination));
+    }
+
+    public static Intent makeIntent(Context context,
+                                    String destination) {
+        Intent myIntent = new Intent(context, MapActivity.class);
+        myIntent.putExtra("newDestination", destination);
+        return myIntent;
+    }
+
+    public static Intent makeIntent(Context context,
+                                    String destination,
+                                    Location mLastKnownLocation) {
+        Intent myIntent = new Intent(context, MapActivity.class);
+        myIntent.putExtra("newDestination", destination);
+        return myIntent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -589,6 +620,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void setDestination(Context context, String location) {
+        mLastKnownDestination = location;
         Context appContext = getApplicationContext();
         Geocoder geocoder = new Geocoder(appContext, Locale.getDefault());
         try {

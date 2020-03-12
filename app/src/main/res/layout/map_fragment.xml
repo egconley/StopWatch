@@ -19,7 +19,7 @@
         android:id="@+id/recyclerView1"
         android:name="com.econley_hle_rvaknin.stopwatch.bottomnavigation.RecentDestinationsFragment"
         android:layout_width="match_parent"
-        android:layout_height="669dp" />
+        android:layout_height="50dp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
