@@ -20,12 +20,12 @@ An Android app that alerts bus commuters when they are close to their stop.  See
 - 6. Lastly, run your StopWatch in your emulator
 
 ## Application in running
-![](/assets/runningApp/HomeSS.png)
-![](/assets/runningApp/recent-tab.png)
-![](/assets/runningApp/search.png)
-![](/assets/runningApp/dialog.png)
-![](/assets/runningApp/geofence.png)
-![](/assets/runningApp/setting.png)
+<img src="/assets/runningApp/HomeSS.png" width="400" height="800">
+<img src="/assets/runningApp/recent-tab.png" width="400" height="800">
+<img src="/assets/runningApp/search.png" width="400" height="800">
+<img src="/assets/runningApp/dialog.png" width="400" height="800">
+<img src="/assets/runningApp/geofence.png" width="400" height="800">
+<img src="/assets/runningApp/setting.png" width="400" height="800">
 
 
 
