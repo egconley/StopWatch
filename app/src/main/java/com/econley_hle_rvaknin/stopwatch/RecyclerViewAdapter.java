@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.econley_hle_rvaknin.stopwatch.bottomnavigation.RecentDestinationsFragment;
+
 import java.util.LinkedList;
 
 /**

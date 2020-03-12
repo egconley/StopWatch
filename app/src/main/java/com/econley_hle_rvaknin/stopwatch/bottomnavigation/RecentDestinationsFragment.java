@@ -1,4 +1,4 @@
-package com.econley_hle_rvaknin.stopwatch;
+package com.econley_hle_rvaknin.stopwatch.bottomnavigation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import com.econley_hle_rvaknin.stopwatch.R;
+import com.econley_hle_rvaknin.stopwatch.RecyclerViewAdapter;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -72,7 +74,7 @@ public class RecentDestinationsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.recent_list_fragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_recent_list, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
