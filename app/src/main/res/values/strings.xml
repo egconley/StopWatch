@@ -17,5 +17,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="setting">Setting</string>
     <string name="transit_guidance_mode">TRANSIT GUIDANCE MODE</string>
+    <string name="textview">TextView</string>
+
     <!--    Maybe put a get destination, after they dropped a pin then change that to set destination.-->
 </resources>
