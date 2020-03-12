@@ -91,6 +91,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     SearchView searchView;
     LatLng destionationLatLng;
 
+    private RecyclerView recyclerView;
+
+
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
     // A default location (Sydney, Australia) and default zoom to use when location permission is
