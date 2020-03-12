@@ -198,7 +198,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         Log.i("haitle16.MapActivity", "address object is empty?: " + destination.isEmpty());
                         if(!destination.isEmpty()) {
                             final Address address = destination.get(0);
-                            selectedAddress = address;
+//                            selectedAddress = address;
                             final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                             mMap.clear();
                             mMap.addMarker(new MarkerOptions().position(latLng).title(location));
@@ -209,7 +209,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             LatLngBounds bounds = builder.build();
                             mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
                             searchView.onActionViewCollapsed();
-                            userDialog();
+                            userDialog(address);
                         }
                         else {
                             // else reload page with search clicked
@@ -242,7 +242,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         final Address address = destination.get(0);
                         mMap.clear();
                         mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(address)));
-                        userDialog();
+                        userDialog(address);
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -582,7 +582,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    public void userDialog() {
+    public void userDialog(Address address) {
+        final Address selectedAddress = address;
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
