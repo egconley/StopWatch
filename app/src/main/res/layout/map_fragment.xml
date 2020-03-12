@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/recyclerView1"
-        android:name="com.econley_hle_rvaknin.stopwatch.TaskFragment"
+        android:name="com.econley_hle_rvaknin.stopwatch.RecentDestinationsFragment"
         android:layout_width="match_parent"
         android:layout_height="669dp" />
 
