@@ -71,7 +71,6 @@ import android.app.NotificationManager;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, BottomNavigationView.OnNavigationItemReselectedListener {
     private static final String TAG = "egc." + MapActivity.class.getSimpleName();
 
-    private static MapActivity instance;
     BottomNavigationView bottomNavigationView;
 
     private GoogleMap mMap;
@@ -79,19 +78,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private Geofence geofence;
 
-    private Address selectedAddress;
-
-    // The entry point to the Places API.
-    private PlacesClient mPlacesClient;
-    // Search stuff
+    // Search
     private SupportMapFragment mapFragment;
     SearchView searchView;
     LatLng destionationLatLng;
 
-    private RecyclerView recyclerView;
-
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
+
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
@@ -101,10 +95,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
+
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
     private String mLastKnownDestination;
+    
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
