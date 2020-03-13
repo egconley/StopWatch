@@ -202,7 +202,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         settingMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem MenuItem) {
-                Intent tosettingpage = new Intent(MapActivity.this, SettingActivity.class);
+                Intent tosettingpage = new Intent(MapActivity.this, SettingsActivity.class);
                 startActivity(tosettingpage);
                 return false;
             }

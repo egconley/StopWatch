@@ -10,7 +10,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
-public class SettingActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,12 +27,12 @@ public class SettingActivity extends AppCompatActivity {
                 editor.putBoolean("guidanceStatus", b);
                 editor.apply();
                 if(b == true) {
-                    Toast toast = Toast.makeText(SettingActivity.this,
+                    Toast toast = Toast.makeText(SettingsActivity.this,
                             "You have selected mode ON!",
                             Toast.LENGTH_SHORT);
                     toast.show();
                 } else {
-                    Toast toast = Toast.makeText(SettingActivity.this,
+                    Toast toast = Toast.makeText(SettingsActivity.this,
                             "You have selected mode OFF!",
                             Toast.LENGTH_SHORT);
                     toast.show();
