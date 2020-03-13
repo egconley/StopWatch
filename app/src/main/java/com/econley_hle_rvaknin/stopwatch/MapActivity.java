@@ -66,7 +66,6 @@ import android.os.Build;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 
-
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, BottomNavigationView.OnNavigationItemReselectedListener {
     private static final String TAG = "egc." + MapActivity.class.getSimpleName();
 
