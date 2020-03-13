@@ -223,39 +223,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     String location = searchView.getQuery().toString();
 
                     setDestination(getApplicationContext(), location);
-
-                    // Pulled the commented out code into setDestination(), declared on 591
-
-//                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-//                    try {
-//                        List<Address> destination = geocoder.getFromLocationName(location, 1);
-//                        Log.i("haitle16.MapActivity", "address object is empty?: " + destination.isEmpty());
-//                        if(!destination.isEmpty()) {
-//                            final Address address = destination.get(0);
-////                            selectedAddress = address;
-//                            final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-//                            mMap.clear();
-//                            mMap.addMarker(new MarkerOptions().position(latLng).title(location));
-//                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-//                            LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
-//                            builder.include(currentlatLng); // get user's location
-//                            builder.include(latLng); // get marker's location and then zoom
-//                            LatLngBounds bounds = builder.build();
-//                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
-//                            searchView.onActionViewCollapsed();
-//                            userDialog(address);
-//                        }
-//                        else {
-//                            // else reload page with search clicked
-//                            Toast toast = Toast.makeText(MapActivity.this,
-//                                    "Search location is invalid, please specify location name and state!",
-//                                    Toast.LENGTH_LONG);
-//                            toast.show();
-//
-//                        }
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
+                    
                     return true;
                 }
 
