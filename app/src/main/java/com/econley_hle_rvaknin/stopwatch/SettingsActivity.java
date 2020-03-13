@@ -18,11 +18,16 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         Switch guidanceSwitch = (Switch) findViewById(R.id.guidance_switch);
+        final SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        boolean guidanceState = storage.getBoolean("guidanceStatus", false);
+        if(guidanceState == true) {
+            guidanceSwitch.setChecked(true);
+        }
         guidanceSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 Log.v("Switch State=", ""+b);
-                SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 SharedPreferences.Editor editor = storage.edit();
                 editor.putBoolean("guidanceStatus", b);
                 editor.apply();
