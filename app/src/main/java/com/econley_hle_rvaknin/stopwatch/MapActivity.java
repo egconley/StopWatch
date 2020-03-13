@@ -90,7 +90,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private RecyclerView recyclerView;
 
-
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
     // A default location (Sydney, Australia) and default zoom to use when location permission is
@@ -194,6 +193,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             super.onSaveInstanceState(outState);
         }
     }
+
     /**
      * Sets up the options menu.
      *
@@ -223,7 +223,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     String location = searchView.getQuery().toString();
 
                     setDestination(getApplicationContext(), location);
-                    
+
                     return true;
                 }
 
@@ -233,7 +233,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     return false;
                 }
             });
-
 
             mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                 @Override
@@ -256,18 +255,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return true;
     }
 
-    /**
-     * Handles a click on the menu option to get a place.
-     * @param item The menu item to handle.
-     * @return Boolean.
-     */
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        if (item.getItemId() == R.id.option_get_place) {
-//            showCurrentPlace();
-//        }
-//        return true;
-//    }
     /**
      * Manipulates the map when it's available.
      * The API invokes this callback when the map is ready to be used.
@@ -387,6 +374,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         updateLocationUI();
     }
+
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
      */
@@ -408,7 +396,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Log.e("Exception: %s", e.getMessage());
         }
     }
-
 
     private void setGeofence(double targetLat, double targetLong) {
         //// creating a geofence with lat long and radius
@@ -448,7 +435,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-
     private GeofencingRequest getGeofencingRequest(Geofence geofence) {
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
@@ -481,8 +467,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         startActivity(intent);
     }
 
-
-
     private void saveToRecents(String address){
         recentDestinations.addFirst(address);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -503,7 +487,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if(recentDestinations == null){
             recentDestinations = new LinkedList<>();
         }
-
         return recentDestinations;
     }
 
@@ -525,10 +508,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     case R.id.recent_routes:
                         findViewById(R.id.recyclerView1).bringToFront();
                         return true;
-
-
                 }
-//                System.out.println("MENU ITEM SELECTED!!!");
                 return false;
             }
         });
@@ -537,8 +517,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void nofificationChannelSetup() {
         //Create notification channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // THESE ARE USER FACING
-            // DO NOT MESS THIS UP
             CharSequence name = "Channel";
             String description = "description";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
@@ -589,7 +567,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Log.i("haitle16.MapActivity", "address object is empty?: " + destination.isEmpty());
             if(!destination.isEmpty()) {
                 final Address address = destination.get(0);
-//                            selectedAddress = address;
                 final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                 mMap.clear();
                 mMap.addMarker(new MarkerOptions().position(latLng).title(location));
@@ -652,8 +629,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                // Do something when No button clicked
-//                                                    passToGooglemap(latLng);
+                                // Do something when no button has been clicked
                                 Toast.makeText(getApplicationContext(),
                                         "You selected No, please search again.", Toast.LENGTH_LONG).show();
                             }
