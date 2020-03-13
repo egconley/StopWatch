@@ -1,5 +1,5 @@
 package com.econley_hle_rvaknin.stopwatch;
-import androidx.annotation.ColorInt;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,11 +7,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.PendingIntent;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,7 +28,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
@@ -51,8 +47,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
@@ -74,25 +68,15 @@ import android.app.NotificationManager;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, BottomNavigationView.OnNavigationItemReselectedListener {
     private static final String TAG = "egc." + MapActivity.class.getSimpleName();
-
-    private static MapActivity instance;
     BottomNavigationView bottomNavigationView;
-
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
-
     private Geofence geofence;
-
-    private Address selectedAddress;
-
     // The entry point to the Places API.
-    private PlacesClient mPlacesClient;
     // Search stuff
-    private SupportMapFragment mapFragment;
     SearchView searchView;
     LatLng destionationLatLng;
 
-    private RecyclerView recyclerView;
 
 
     // The entry point to the Fused Location Provider.
@@ -668,7 +652,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 destionationLatLng = latLng;
                                 recentDestinations = loadRecents();
                                 saveToRecents(destination);
-
                                 setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
                                 mMap.addCircle(new CircleOptions()
                                         .center(destionationLatLng)

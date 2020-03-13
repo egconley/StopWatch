@@ -106,10 +106,9 @@ public class RecentDestinationsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         // when main resumes (fragment also resumes) and makes a query to the database we set network first we specify network first.
-
         adapter = new RecyclerViewAdapter(recentDestinations, null);
-        System.out.println("757575" + recentDestinations.size());
         recyclerView.setAdapter(adapter);
+
 
     }
 
