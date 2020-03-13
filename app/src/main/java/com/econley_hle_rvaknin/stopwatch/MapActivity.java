@@ -57,6 +57,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -476,12 +477,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Gson gson = new Gson();
         String json = sharedPreferences.getString("recent destination list", null);
         Type type = new TypeToken<LinkedList<String>>() {}.getType();
+        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
         recentDestinations = gson.fromJson(json, type);
 
         if(recentDestinations == null){
             recentDestinations = new LinkedList<>();
+            // dedup list of recent destinations
+            HashSet<String> set = new HashSet<>();
+            for (String address : recentDestinations) {
+                set.add(address);
+            }
+            for (String address : set) {
+                distinctRecentDestinations.add(address);
+            }
         }
-        return recentDestinations;
+        return distinctRecentDestinations;
     }
 
     private void bottomNavigationSetUp() {
