@@ -33,7 +33,6 @@ import java.util.LinkedList;
 public class RecentDestinationsFragment extends Fragment {
     RecyclerView recyclerView;
 
-
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
@@ -85,7 +84,6 @@ public class RecentDestinationsFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-
         }
         return view;
     }
@@ -96,20 +94,14 @@ public class RecentDestinationsFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
-        } else {
-//            throw new RuntimeException(context.toString()
-////                    + " must implement OnListFragmentInteractionListener");
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // when main resumes (fragment also resumes) and makes a query to the database we set network first we specify network first.
         adapter = new RecyclerViewAdapter(recentDestinations, null);
         recyclerView.setAdapter(adapter);
-
-
     }
 
     @Override
@@ -131,7 +123,7 @@ public class RecentDestinationsFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(Task item);
+        void onListFragmentInteraction(String item);
     }
 
     private LinkedList<String> loadRecents() {

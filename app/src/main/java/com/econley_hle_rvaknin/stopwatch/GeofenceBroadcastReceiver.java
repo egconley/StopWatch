@@ -17,7 +17,6 @@ import java.util.List;
 
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
-    private static boolean withinRadius = false;
     static String CHANNEL_ID = "101";
 
     public void onReceive(Context context, Intent intent) {
@@ -31,27 +30,23 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
         // Get the transition type.
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
-         System.out.println("geofenceTransition = " + geofenceTransition);
 
         // Test that the reported transition was of interest.
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER){
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
-            Log.e("ehr", "ENTERED THE DANGER ZONEEEEE");
-            System.out.println("Welcome to the jungle!!!");
+            Log.e("ehr", "Entered Notification Zone");
 
             // Send Notification
-            withinRadius=true;
             sendNotification(context);
 
         } else {
             // Log the error.
-            Log.e("ehr", "failed to enter geofence");
+            Log.e("ehr", "Failed to cross Geofence");
         }
     }
 
     public void sendNotification(Context context) {
         // Create an explicit intent for an Activity in your app
-        System.out.println("SEND NOTIFICATION CALLEDDDDD!!!!!!!");
         Intent intent = new Intent(context, MapActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
