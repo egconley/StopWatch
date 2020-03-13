@@ -401,9 +401,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                 .build();
 
-        System.out.println("targetLat = " + targetLat);
-        System.out.println("targetLong = " + targetLong);
-
         // creating a request using the geofence we created in previous code block
         GeofencingRequest geofencingRequest = getGeofencingRequest(geofence);
 
