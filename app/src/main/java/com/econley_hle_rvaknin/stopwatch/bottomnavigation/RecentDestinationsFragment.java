@@ -96,19 +96,13 @@ public class RecentDestinationsFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
-        } else {
-//            throw new RuntimeException(context.toString()
-////                    + " must implement OnListFragmentInteractionListener");
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // when main resumes (fragment also resumes) and makes a query to the database we set network first we specify network first.
-
         adapter = new RecyclerViewAdapter(recentDestinations, null);
-        System.out.println("757575" + recentDestinations.size());
         recyclerView.setAdapter(adapter);
 
     }
@@ -132,7 +126,7 @@ public class RecentDestinationsFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(Task item);
+        void onListFragmentInteraction(String item);
     }
 
     private LinkedList<String> loadRecents() {
