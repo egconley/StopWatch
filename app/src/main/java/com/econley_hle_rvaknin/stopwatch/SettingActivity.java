@@ -16,7 +16,6 @@ public class SettingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
-        Log.i("haitle16.Setting", "Made it into setting page.");
 
         Switch guidanceSwitch = (Switch) findViewById(R.id.guidance_switch);
         guidanceSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -38,8 +37,6 @@ public class SettingActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT);
                     toast.show();
                 }
-
-
             }
         });
 
