@@ -33,7 +33,6 @@ import java.util.LinkedList;
 public class RecentDestinationsFragment extends Fragment {
     RecyclerView recyclerView;
 
-
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
@@ -85,7 +84,6 @@ public class RecentDestinationsFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-
         }
         return view;
     }
@@ -104,7 +102,6 @@ public class RecentDestinationsFragment extends Fragment {
         super.onResume();
         adapter = new RecyclerViewAdapter(recentDestinations, null);
         recyclerView.setAdapter(adapter);
-
     }
 
     @Override
