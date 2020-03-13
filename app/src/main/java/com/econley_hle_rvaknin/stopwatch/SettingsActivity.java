@@ -15,7 +15,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setting);
+        setContentView(R.layout.activity_settings);
 
         Switch guidanceSwitch = (Switch) findViewById(R.id.guidance_switch);
         guidanceSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
