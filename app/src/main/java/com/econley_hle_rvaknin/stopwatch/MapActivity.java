@@ -675,6 +675,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                         .strokeColor(Color.argb(100, 98, 0, 238))
                                         .fillColor(Color.argb(50, 98, 0, 238))
                                         .radius(300f));
+
+                                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+                                builder.include(currentlatLng); // get user's location
+                                builder.include(latLng); // get marker's location and then zoom
+                                LatLngBounds bounds = builder.build();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
+
                                 SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
                                 Boolean userGuidanceMode = storage.getBoolean("guidanceStatus",false);
