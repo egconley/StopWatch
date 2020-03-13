@@ -6,7 +6,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.PendingIntent;
 
@@ -52,7 +51,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -100,7 +98,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
     private String mLastKnownDestination;
-    
+
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
@@ -534,7 +532,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     @Override
                     public void onComplete(@NonNull Task<InstanceIdResult> task) {
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "getInstanceId failed", task.getException());
                             return;
                         }
 
@@ -560,7 +557,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Geocoder geocoder = new Geocoder(appContext, Locale.getDefault());
         try {
             List<Address> destination = geocoder.getFromLocationName(location, 1);
-            Log.i("haitle16.MapActivity", "address object is empty?: " + destination.isEmpty());
             if(!destination.isEmpty()) {
                 final Address address = destination.get(0);
                 final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
