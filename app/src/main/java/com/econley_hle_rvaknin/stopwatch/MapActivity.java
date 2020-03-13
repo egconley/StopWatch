@@ -544,14 +544,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         if (!task.isSuccessful()) {
                             return;
                         }
-
                         // Get new Instance ID token
                         String token = task.getResult().getToken();
 
                         // Log and toast
                         String msg = getString(R.string.msg_token_fmt, token);
                         Log.d("INSTANCE ID", msg);
-//                        Toast.makeText(MapActivity.this, msg, Toast.LENGTH_LONG).show();
                     }
                 });
     }
