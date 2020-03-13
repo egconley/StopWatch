@@ -1,4 +1,5 @@
 package com.econley_hle_rvaknin.stopwatch;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,8 +8,9 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 
-import android.app.PendingIntent;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,7 +30,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
@@ -70,16 +71,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final String TAG = "egc." + MapActivity.class.getSimpleName();
 
     BottomNavigationView bottomNavigationView;
-
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
-
     private Geofence geofence;
 
     // Search
     private SupportMapFragment mapFragment;
     SearchView searchView;
     LatLng destionationLatLng;
+
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -605,13 +605,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 destionationLatLng = latLng;
                                 recentDestinations = loadRecents();
                                 saveToRecents(destination);
-
                                 setGeofence(destionationLatLng.latitude,destionationLatLng.longitude);
                                 mMap.addCircle(new CircleOptions()
                                         .center(destionationLatLng)
                                         .strokeColor(Color.argb(100, 98, 0, 238))
                                         .fillColor(Color.argb(50, 98, 0, 238))
                                         .radius(300f));
+
+                                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+                                builder.include(currentlatLng); // get user's location
+                                builder.include(latLng); // get marker's location and then zoom
+                                LatLngBounds bounds = builder.build();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
+
                                 SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
                                 Boolean userGuidanceMode = storage.getBoolean("guidanceStatus",false);
