@@ -107,34 +107,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     static String CHANNEL_ID = "101";
 
-    // TODO: hook these up to help persist location data between the recycler view and the map activity
-    public static void start(Context context,
-                             String mLastKnownDestination,
-                             Location mLastKnownLocation) {
-        context.startActivity(makeIntent(context, mLastKnownDestination, mLastKnownLocation));
-    }
-
-    public static void start(Context context,
-                             String mLastKnownDestination) {
-        context.startActivity(makeIntent(context, mLastKnownDestination));
-    }
-
-    public static Intent makeIntent(Context context,
-                                    String destination) {
-        Intent myIntent = new Intent(context, MapActivity.class);
-        myIntent.putExtra("newDestination", destination);
-        return myIntent;
-    }
-
-    public static Intent makeIntent(Context context,
-                                    String destination,
-                                    Location mLastKnownLocation) {
-        Intent myIntent = new Intent(context, MapActivity.class);
-        myIntent.putExtra("newDestination", destination);
-        return myIntent;
-    }
-    // ^TODO: hook these up to help persist location data between the recycler view and the map activity
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
