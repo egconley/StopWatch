@@ -25,7 +25,7 @@ Android Emulator
 6. Click the green play button to build and run StopWatch.
 
 ## Screenshots
-![](/assets/runningApp/HomeSS.png){:height="50%" width="50%"}
+![](/assets/runningApp/HomeSS.png)
 ![](/assets/runningApp/recent-destinations.png)
 ![](/assets/runningApp/search.png)
 ![](/assets/runningApp/dialog.png)
