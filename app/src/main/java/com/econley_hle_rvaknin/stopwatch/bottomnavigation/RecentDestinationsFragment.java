@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -103,6 +104,7 @@ public class RecentDestinationsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        recentDestinations = loadRecents();
         adapter = new RecyclerViewAdapter(recentDestinations, null, activity);
         recyclerView.setAdapter(adapter);
     }
@@ -140,6 +142,16 @@ public class RecentDestinationsFragment extends Fragment {
             recentDestinations = new LinkedList<>();
         }
 
-        return recentDestinations;
+        // dedup list of recent destinations
+        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
+        HashSet<String> set = new HashSet<>();
+        for (String address : recentDestinations) {
+            set.add(address);
+        }
+        for (String address : set) {
+            distinctRecentDestinations.add(address);
+        }
+
+        return distinctRecentDestinations;
     }
 }

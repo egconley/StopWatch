@@ -495,6 +495,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void saveToRecents(String address) {
+        recentDestinations = loadRecents();
         recentDestinations.addFirst(address);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -510,20 +511,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         String json = sharedPreferences.getString("recent destination list", null);
         Type type = new TypeToken<LinkedList<String>>() {
         }.getType();
-        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
         recentDestinations = gson.fromJson(json, type);
 
         if (recentDestinations == null) {
             recentDestinations = new LinkedList<>();
-            // dedup list of recent destinations
-            HashSet<String> set = new HashSet<>();
-            for (String address : recentDestinations) {
-                set.add(address);
-            }
-            for (String address : set) {
-                distinctRecentDestinations.add(address);
-            }
         }
+
+        // dedup list of recent destinations
+        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
+        HashSet<String> set = new HashSet<>();
+        for (String address : recentDestinations) {
+            set.add(address);
+        }
+        for (String address : set) {
+            distinctRecentDestinations.add(address);
+        }
+
         return distinctRecentDestinations;
     }
 
