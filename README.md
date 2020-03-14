@@ -6,7 +6,7 @@ An Android app that alerts bus commuters when they are close to their stop.  See
 - [Java](https://www.java.com/en/)
 - [Android Studio](https://developer.android.com/)
 - [Gradle](https://gradle.org/)
-- [Google Maps Embedded API](https://developers.google.com/maps/documentation/embed/start)
+- [Google Maps SDK for Android](https://developers.google.com/maps/documentation/android-sdk/intro)
 
 ## Setup Instructions
 Android Phone
@@ -25,7 +25,7 @@ Android Emulator
 6. Click the green play button to build and run StopWatch.
 
 ## Screenshots
-![](/assets/runningApp/HomeSS.png){:height="50%" width="50%"}
+![](/assets/runningApp/HomeSS.png)
 ![](/assets/runningApp/recent-destinations.png)
 ![](/assets/runningApp/search.png)
 ![](/assets/runningApp/dialog.png)
