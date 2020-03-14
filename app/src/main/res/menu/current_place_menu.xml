@@ -12,7 +12,7 @@
             app:actionViewClass="androidx.appcompat.widget.SearchView" />
         <item
             android:id="@+id/settingMenu"
-            android:title="@string/option_setting" />
+            android:title="@string/settings" />
 
     </group>
 

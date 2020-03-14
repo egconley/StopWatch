@@ -1,5 +1,6 @@
 package com.econley_hle_rvaknin.stopwatch.bottomnavigation;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -33,7 +34,6 @@ import java.util.LinkedList;
 public class RecentDestinationsFragment extends Fragment {
     RecyclerView recyclerView;
 
-
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
@@ -41,7 +41,7 @@ public class RecentDestinationsFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
     private RecyclerViewAdapter adapter;
     private LinkedList<String> recentDestinations;
-
+    Activity activity;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -68,6 +68,8 @@ public class RecentDestinationsFragment extends Fragment {
         }
         recentDestinations = loadRecents();
         System.out.println(recentDestinations.size());
+        activity = getActivity();
+        System.out.println("activity = " + activity);
     }
 
     @Override
@@ -85,7 +87,6 @@ public class RecentDestinationsFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-
         }
         return view;
     }
@@ -96,21 +97,14 @@ public class RecentDestinationsFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
-        } else {
-//            throw new RuntimeException(context.toString()
-////                    + " must implement OnListFragmentInteractionListener");
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // when main resumes (fragment also resumes) and makes a query to the database we set network first we specify network first.
-
-        adapter = new RecyclerViewAdapter(recentDestinations, null);
-        System.out.println("757575" + recentDestinations.size());
+        adapter = new RecyclerViewAdapter(recentDestinations, null, activity);
         recyclerView.setAdapter(adapter);
-
     }
 
     @Override
@@ -132,7 +126,7 @@ public class RecentDestinationsFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(Task item);
+        void onListFragmentInteraction(String item);
     }
 
     private LinkedList<String> loadRecents() {

@@ -1,7 +1,7 @@
 # StopWatch Software Requirements
 
 ## Vision
-It can be a challenge to make use of time spent on the bus to read a book or listen to a podcast if you’re worried that you’ll miss your stop.  The goal of StopWatch is to release bus commuters of the need to keep track of stops so that they fully devote their attention else, worry free.
+The goal of StopWatch is to release bus commuters of the need to keep track of stops so that they can read a book or listen to a podcast, without worrying that they’ll miss their stop.
 
 ## Scope
 ### In Scope
@@ -16,11 +16,6 @@ It can be a challenge to make use of time spent on the bus to read a book or lis
 
 ### Out of Scope
 - Help users plan their bus trip
-
-## Functional Requirements
-### Data Flow
-
-## Non-Functional Requirements
 
 ## User Stories
 ### MVP
@@ -77,7 +72,7 @@ It can be a challenge to make use of time spent on the bus to read a book or lis
    
 
 
-## Wireframes
+## Initial Wireframes
 
 ### Select Route
 ![](./assets/wireframes/SelectRouteWireFrame.png)
