@@ -6,7 +6,7 @@ An Android app that alerts bus commuters when they are close to their stop.  See
 - [Java](https://www.java.com/en/)
 - [Android Studio](https://developer.android.com/)
 - [Gradle](https://gradle.org/)
-- [Google Maps Embedded API](https://developers.google.com/maps/documentation/embed/start)
+- [Google Maps SDK for Android](https://developers.google.com/maps/documentation/android-sdk/intro)
 
 ## Setup Instructions
 Android Phone
