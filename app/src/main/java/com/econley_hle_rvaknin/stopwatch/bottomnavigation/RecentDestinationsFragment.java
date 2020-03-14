@@ -1,5 +1,6 @@
 package com.econley_hle_rvaknin.stopwatch.bottomnavigation;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -40,7 +41,7 @@ public class RecentDestinationsFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
     private RecyclerViewAdapter adapter;
     private LinkedList<String> recentDestinations;
-
+    Activity activity;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -67,6 +68,8 @@ public class RecentDestinationsFragment extends Fragment {
         }
         recentDestinations = loadRecents();
         System.out.println(recentDestinations.size());
+        activity = getActivity();
+        System.out.println("activity = " + activity);
     }
 
     @Override
@@ -100,7 +103,7 @@ public class RecentDestinationsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        adapter = new RecyclerViewAdapter(recentDestinations, null);
+        adapter = new RecyclerViewAdapter(recentDestinations, null, activity);
         recyclerView.setAdapter(adapter);
     }
 

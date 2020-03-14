@@ -1,23 +1,39 @@
 package com.econley_hle_rvaknin.stopwatch;
 
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import com.econley_hle_rvaknin.stopwatch.bottomnavigation.RecentDestinationsFragment;
+
+import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
     private final String TAG = "rvrv";
     private LinkedList<String> mValues;
+    private Activity mActivity;
     private final RecentDestinationsFragment.OnListFragmentInteractionListener mListener;
 
-    public RecyclerViewAdapter(LinkedList<String> items, RecentDestinationsFragment.OnListFragmentInteractionListener listener) {
+    public RecyclerViewAdapter(LinkedList<String> items, RecentDestinationsFragment.OnListFragmentInteractionListener listener, Activity mActivity) {
         mValues = items;
         mListener = listener;
+        mActivity = mActivity;
     }
 
     @Override
@@ -31,12 +47,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.mItem = mValues.get(position);
         holder.mTitleView.setText(mValues.get(position));
-
         holder.mView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Context context = v.getContext();
-                String location = mValues.getFirst();
-                MapActivity.start(context, location);
+                String strAddress = mValues.get(position);
+                System.out.println("strAddress = " + strAddress);
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(v.getContext());
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("isRecyclerViewClicked5",true);
+                editor.apply();
+                Intent i = new Intent(v.getContext(),MapActivity.class);
+                i.putExtra("address",strAddress);
+                v.getContext().startActivity(i);
             }
         });
     }
