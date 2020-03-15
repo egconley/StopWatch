@@ -632,6 +632,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 builder.include(currentlatLng); // get user's location
                                 builder.include(latLng); // get marker's location and then zoom
                                 LatLngBounds bounds = builder.build();
+                                mMap.addMarker(new MarkerOptions().position(latLng).title(destination));
+
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
 
                                 SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
