@@ -107,34 +107,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     static String CHANNEL_ID = "101";
 
-    // TODO: hook these up to help persist location data between the recycler view and the map activity
-    public static void start(Context context,
-                             String mLastKnownDestination,
-                             Location mLastKnownLocation) {
-        context.startActivity(makeIntent(context, mLastKnownDestination, mLastKnownLocation));
-    }
-
-    public static void start(Context context,
-                             String mLastKnownDestination) {
-        context.startActivity(makeIntent(context, mLastKnownDestination));
-    }
-
-    public static Intent makeIntent(Context context,
-                                    String destination) {
-        Intent myIntent = new Intent(context, MapActivity.class);
-        myIntent.putExtra("newDestination", destination);
-        return myIntent;
-    }
-
-    public static Intent makeIntent(Context context,
-                                    String destination,
-                                    Location mLastKnownLocation) {
-        Intent myIntent = new Intent(context, MapActivity.class);
-        myIntent.putExtra("newDestination", destination);
-        return myIntent;
-    }
-    // ^TODO: hook these up to help persist location data between the recycler view and the map activity
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -495,6 +467,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void saveToRecents(String address) {
+        recentDestinations = loadRecents();
         recentDestinations.addFirst(address);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -510,20 +483,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         String json = sharedPreferences.getString("recent destination list", null);
         Type type = new TypeToken<LinkedList<String>>() {
         }.getType();
-        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
         recentDestinations = gson.fromJson(json, type);
 
         if (recentDestinations == null) {
             recentDestinations = new LinkedList<>();
-            // dedup list of recent destinations
-            HashSet<String> set = new HashSet<>();
-            for (String address : recentDestinations) {
-                set.add(address);
-            }
-            for (String address : set) {
-                distinctRecentDestinations.add(address);
-            }
         }
+
+        // dedup list of recent destinations
+        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
+        HashSet<String> set = new HashSet<>();
+        for (String address : recentDestinations) {
+            set.add(address);
+        }
+        for (String address : set) {
+            distinctRecentDestinations.add(address);
+        }
+
         return distinctRecentDestinations;
     }
 
@@ -657,6 +632,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 builder.include(currentlatLng); // get user's location
                                 builder.include(latLng); // get marker's location and then zoom
                                 LatLngBounds bounds = builder.build();
+                                mMap.addMarker(new MarkerOptions().position(latLng).title(destination));
+
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
 
                                 SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
