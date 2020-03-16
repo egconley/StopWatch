@@ -51,8 +51,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -138,7 +136,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         bottomNavigationSetUp();
         nofificationChannelSetup();
-        firebaseSetup();
 
     }
 
@@ -146,7 +143,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onResume() {
         super.onResume();
         // Make sure Google Play Services is compatible with Firebase
-        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
+//        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
         Log.i("rvrv", "On resume is being called");
 
         String addressFromRecyclerView = getIntent().getStringExtra("address");
@@ -543,27 +540,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
-    }
-
-    private void firebaseSetup() {
-        // Firebase
-        // Make sure Google Play Services is compatible with Firebase
-        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (!task.isSuccessful()) {
-                            return;
-                        }
-                        // Get new Instance ID token
-                        String token = task.getResult().getToken();
-
-                        // Log and toast
-                        String msg = getString(R.string.msg_token_fmt, token);
-                        Log.d("INSTANCE ID", msg);
-                    }
-                });
     }
 
     @Override
