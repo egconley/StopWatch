@@ -340,8 +340,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 setMapZoom(latLng);
 
                                 SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                                Boolean userGuidanceMode = storage.getBoolean("guidanceStatus", false);
-                                if (userGuidanceMode == true) {
+                                boolean userGuidanceMode = storage.getBoolean("guidanceStatus", false);
+                                if (userGuidanceMode) {
                                     passToGooglemap(latLng);
                                 }
                             }
