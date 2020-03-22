@@ -1,7 +1,6 @@
 package com.econley_hle_rvaknin.stopwatch;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -31,7 +30,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
@@ -51,8 +49,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -79,8 +75,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     // Search
     private SupportMapFragment mapFragment;
     SearchView searchView;
-    LatLng destionationLatLng;
-
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -106,6 +100,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     static String CHANNEL_ID = "101";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,46 +133,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         bottomNavigationSetUp();
         nofificationChannelSetup();
-        firebaseSetup();
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Make sure Google Play Services is compatible with Firebase
-        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
         Log.i("rvrv", "On resume is being called");
 
         String addressFromRecyclerView = getIntent().getStringExtra("address");
-        System.out.println("addressFromRecyclerView = " + addressFromRecyclerView);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         isDataSentFromRecyclerView = sharedPreferences.getBoolean("isRecyclerViewClicked5", false);
-//        isDataSentFromRecyclerView = false;
-        System.out.println("isDataSentFromRecyclerView = " + isDataSentFromRecyclerView);
-        Address address;
+        isDataSentFromRecyclerView = false;
+
         if (isDataSentFromRecyclerView) {
             Log.i(TAG, "WORKING");
 
             Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-            isDataSentFromRecyclerView = true;
-            try {
-                address = geocoder.getFromLocationName(addressFromRecyclerView, 1).get(0);
-                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("isRecyclerViewClicked5", false);
-                editor.apply();
-                userDialog(address);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Address address = setAddress(addressFromRecyclerView, geocoder);
+            userDialog(address);
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean("isRecyclerViewClicked5", false);
         }
         else {
-            Log.i(TAG, "DOESNT WORK");
+            Log.i(TAG, "Not resuming from recycler view click.");
         }
-
-
     }
 
     /**
@@ -191,6 +171,210 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
             super.onSaveInstanceState(outState);
         }
+    }
+
+    public Address setAddress(String location, Geocoder geocoder) {
+        List<Address> destination = null;
+        try {
+            destination = geocoder.getFromLocationName(location, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Address address = destination.get(0);
+        return address;
+    }
+
+    public Address setAddressFromLatLong(LatLng latLng, Geocoder geocoder) {
+        List<Address> destination = null;
+        try {
+            destination = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Address address = destination.get(0);
+        return address;
+    }
+
+    public LatLng setNewMarker(Address address) {
+        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(address)));
+        return latLng;
+    }
+
+    public void setMapZoom(LatLng marker) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+        builder.include(currentlatLng); // get user's location
+        builder.include(marker); // get marker's location and then zoom
+        LatLngBounds bounds = builder.build();
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
+    }
+
+    public void setDestination(Context context, String location) {
+        mLastKnownDestination = location;
+        Context appContext = getApplicationContext();
+        Geocoder geocoder = new Geocoder(appContext, Locale.getDefault());
+        Address address = setAddress(location, geocoder);
+        LatLng marker = setNewMarker(address);
+        setMapZoom(marker);
+        searchView.onActionViewCollapsed();
+        userDialog(address);
+    }
+
+    private void setGeofence(double targetLat, double targetLong) {
+        //// creating a geofence with lat long and radius
+        geofence = new Geofence.Builder()
+                .setRequestId("destination")
+                .setCircularRegion(targetLat, targetLong, 300)
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                .build();
+
+        // creating a request using the geofence we created in previous code block
+        GeofencingRequest geofencingRequest = getGeofencingRequest(geofence);
+
+        // create an intent and set it to be a pending intent.
+        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //add the geofence to map
+        LocationServices.getGeofencingClient(this).addGeofences(geofencingRequest, pendingIntent)
+                .addOnSuccessListener(this, new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "added geofences yeahh!!!");
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "failed to add geofence :( ");
+                        Log.e("ehr ERROR", e.toString());
+
+                    }
+                });
+
+    }
+
+    private GeofencingRequest getGeofencingRequest(Geofence geofence) {
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofence(geofence);
+        return builder.build();
+    }
+
+    private void stopGeofenceMonitoring() {
+        List<String> geofenceIds = new ArrayList<>();
+        geofenceIds.add("destination");
+        LocationServices.getGeofencingClient(this).removeGeofences(geofenceIds)
+                .addOnSuccessListener(this, new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "removed geofences yeahh!!!");
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "Failed to remove geofences :( ");
+                    }
+                });
+    }
+
+    private void saveToRecents(String address) {
+        recentDestinations = loadRecents();
+        recentDestinations.addFirst(address);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(recentDestinations);
+        editor.putString("recent destination list", json);
+        editor.apply();
+    }
+
+    private LinkedList<String> loadRecents() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("recent destination list", null);
+        Type type = new TypeToken<LinkedList<String>>() {
+        }.getType();
+        recentDestinations = gson.fromJson(json, type);
+
+        if (recentDestinations == null) {
+            recentDestinations = new LinkedList<>();
+        }
+
+        // dedup list of recent destinations
+        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
+        HashSet<String> set = new HashSet<>();
+        for (String address : recentDestinations) {
+            set.add(address);
+        }
+        for (String address : set) {
+            distinctRecentDestinations.add(address);
+        }
+
+        return distinctRecentDestinations;
+    }
+
+    public void passToGooglemap(LatLng latLng) {
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr=" + mLastKnownLocation.getLatitude() + "," + mLastKnownLocation.getLongitude() + "&daddr=" + latLng.latitude + "," + latLng.longitude));
+        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+        Log.i("erh", "gotten into passToGooglemap");
+        startActivity(intent);
+    }
+
+    public void userDialog(Address address) {
+        final Address selectedAddress = address;
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
+                        dialogbuilder.setTitle("Set destination?");
+                        final String destination = selectedAddress.getAddressLine(0);
+                        final LatLng latLng = new LatLng(selectedAddress.getLatitude(), selectedAddress.getLongitude());
+                        dialogbuilder.setMessage(destination);
+                        dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                recentDestinations = loadRecents();
+                                saveToRecents(destination);
+
+                                setNewMarker(selectedAddress);
+                                setGeofence(latLng.latitude, latLng.longitude);
+                                mMap.addCircle(new CircleOptions()
+                                        .center(latLng)
+                                        .strokeColor(Color.argb(100, 98, 0, 238))
+                                        .fillColor(Color.argb(50, 98, 0, 238))
+                                        .radius(300f));
+                                setMapZoom(latLng);
+
+                                SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                                Boolean userGuidanceMode = storage.getBoolean("guidanceStatus", false);
+                                if (userGuidanceMode == true) {
+                                    passToGooglemap(latLng);
+                                }
+                            }
+                        });
+
+                        // Set the alert dialog no button click listener
+                        dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do something when no button has been clicked
+                                Toast.makeText(getApplicationContext(),
+                                        "You selected No, please search again.", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                        AlertDialog dialog = dialogbuilder.create();
+                        // Display the alert dialog on interface
+                        dialog.show();
+                    }
+                },
+                700);
     }
 
     /**
@@ -220,15 +404,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     String location = searchView.getQuery().toString();
-
                     setDestination(getApplicationContext(), location);
-
                     return true;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String query) {
-
                     return false;
                 }
             });
@@ -237,21 +418,54 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 @Override
                 public void onMapLongClick(final LatLng latLng) {
                     Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                    try {
-                        List<Address> destination = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                        final Address address = destination.get(0);
-                        mMap.clear();
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(address)));
-                        userDialog(address);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
+                    Address address = setAddressFromLatLong(latLng, geocoder);
+                    setNewMarker(address);
+                    userDialog(address);
                 }
             });
         }
         return true;
+    }
+
+    private void bottomNavigationSetUp() {
+        // Event listener for bottom navigation menu
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        // sets initial selected item to map
+        bottomNavigationView.setSelectedItemId(R.id.navigation_map);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.navigation_map:
+                        findViewById(R.id.map).bringToFront();
+
+                        return true;
+                    case R.id.favorite_routes:
+                        System.out.println("MENU FAVORITE SELECTED!!!");
+                        return false;
+                    case R.id.recent_routes:
+                        findViewById(R.id.recyclerView1).bringToFront();
+
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void nofificationChannelSetup() {
+        //Create notification channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Channel";
+            String description = "description";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     /**
@@ -399,268 +613,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private void setGeofence(double targetLat, double targetLong) {
-        //// creating a geofence with lat long and radius
-        geofence = new Geofence.Builder()
-                .setRequestId("destination")
-                .setCircularRegion(targetLat, targetLong, 300)
-                .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-                .build();
-
-        // creating a request using the geofence we created in previous code block
-        GeofencingRequest geofencingRequest = getGeofencingRequest(geofence);
-
-        // create an intent and set it to be a pending intent.
-        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //add the geofence to map
-        LocationServices.getGeofencingClient(this).addGeofences(geofencingRequest, pendingIntent)
-                .addOnSuccessListener(this, new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "added geofences yeahh!!!");
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "failed to add geofence :( ");
-                        Log.e("ehr ERROR", e.toString());
-
-                    }
-                });
-
-    }
-
-    private GeofencingRequest getGeofencingRequest(Geofence geofence) {
-        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-        builder.addGeofence(geofence);
-        return builder.build();
-    }
-
-    private void stopGeofenceMonitoring() {
-        List<String> geofenceIds = new ArrayList<>();
-        geofenceIds.add("destination");
-        LocationServices.getGeofencingClient(this).removeGeofences(geofenceIds)
-                .addOnSuccessListener(this, new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "removed geofences yeahh!!!");
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "Failed to remove geofences :( ");
-                    }
-                });
-    }
-
-    public void passToGooglemap(LatLng latLng) {
-        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr=" + mLastKnownLocation.getLatitude() + "," + mLastKnownLocation.getLongitude() + "&daddr=" + latLng.latitude + "," + latLng.longitude));
-        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-        Log.i("erh", "gotten into passToGooglemap");
-        startActivity(intent);
-    }
-
-    private void saveToRecents(String address) {
-        recentDestinations = loadRecents();
-        recentDestinations.addFirst(address);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(recentDestinations);
-        editor.putString("recent destination list", json);
-        editor.apply();
-    }
-
-    private LinkedList<String> loadRecents() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString("recent destination list", null);
-        Type type = new TypeToken<LinkedList<String>>() {
-        }.getType();
-        recentDestinations = gson.fromJson(json, type);
-
-        if (recentDestinations == null) {
-            recentDestinations = new LinkedList<>();
-        }
-
-        // dedup list of recent destinations
-        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
-        HashSet<String> set = new HashSet<>();
-        for (String address : recentDestinations) {
-            set.add(address);
-        }
-        for (String address : set) {
-            distinctRecentDestinations.add(address);
-        }
-
-        return distinctRecentDestinations;
-    }
-
-
-    private void bottomNavigationSetUp() {
-        // Event listener for bottom navigation menu
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        // sets initial selected item to map
-        bottomNavigationView.setSelectedItemId(R.id.navigation_map);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.navigation_map:
-                        findViewById(R.id.map).bringToFront();
-
-                        return true;
-                    case R.id.favorite_routes:
-                        System.out.println("MENU FAVORITE SELECTED!!!");
-                        return false;
-                    case R.id.recent_routes:
-                        findViewById(R.id.recyclerView1).bringToFront();
-
-                        return true;
-                }
-                return false;
-            }
-        });
-    }
-
-
-    private void nofificationChannelSetup() {
-        //Create notification channel
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Channel";
-            String description = "description";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    private void firebaseSetup() {
-        // Firebase
-        // Make sure Google Play Services is compatible with Firebase
-        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (!task.isSuccessful()) {
-                            return;
-                        }
-                        // Get new Instance ID token
-                        String token = task.getResult().getToken();
-
-                        // Log and toast
-                        String msg = getString(R.string.msg_token_fmt, token);
-                        Log.d("INSTANCE ID", msg);
-                    }
-                });
-    }
-
     @Override
     public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
 
-    }
-
-    public void setDestination(Context context, String location) {
-        mLastKnownDestination = location;
-        Context appContext = getApplicationContext();
-        Geocoder geocoder = new Geocoder(appContext, Locale.getDefault());
-        try {
-            List<Address> destination = geocoder.getFromLocationName(location, 1);
-            if (!destination.isEmpty()) {
-                final Address address = destination.get(0);
-                final LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(latLng).title(location));
-                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                builder.include(currentlatLng); // get user's location
-                builder.include(latLng); // get marker's location and then zoom
-                LatLngBounds bounds = builder.build();
-                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
-                searchView.onActionViewCollapsed();
-                userDialog(address);
-            } else {
-                // else reload page with search clicked
-                Toast toast = Toast.makeText(MapActivity.this,
-                        "Search location is invalid, please specify location name and state!",
-                        Toast.LENGTH_LONG);
-                toast.show();
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void userDialog(Address address) {
-        final Address selectedAddress = address;
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MapActivity.this);
-                        dialogbuilder.setTitle("Set destination?");
-                        final String destination = selectedAddress.getAddressLine(0);
-                        final LatLng latLng = new LatLng(selectedAddress.getLatitude(), selectedAddress.getLongitude());
-                        dialogbuilder.setMessage(destination);
-                        dialogbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Do something when user clicked the Yes button
-                                destionationLatLng = latLng;
-                                recentDestinations = loadRecents();
-                                saveToRecents(destination);
-                                setGeofence(destionationLatLng.latitude, destionationLatLng.longitude);
-                                mMap.addCircle(new CircleOptions()
-                                        .center(destionationLatLng)
-                                        .strokeColor(Color.argb(100, 98, 0, 238))
-                                        .fillColor(Color.argb(50, 98, 0, 238))
-                                        .radius(300f));
-
-                                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                                LatLng currentlatLng = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                                builder.include(currentlatLng); // get user's location
-                                builder.include(latLng); // get marker's location and then zoom
-                                LatLngBounds bounds = builder.build();
-                                mMap.addMarker(new MarkerOptions().position(latLng).title(destination));
-
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
-
-                                SharedPreferences storage = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-                                Boolean userGuidanceMode = storage.getBoolean("guidanceStatus", false);
-                                if (userGuidanceMode == true) {
-                                    passToGooglemap(latLng);
-                                }
-                            }
-                        });
-
-                        // Set the alert dialog no button click listener
-                        dialogbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Do something when no button has been clicked
-                                Toast.makeText(getApplicationContext(),
-                                        "You selected No, please search again.", Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                        AlertDialog dialog = dialogbuilder.create();
-                        // Display the alert dialog on interface
-                        dialog.show();
-                    }
-                },
-                700);
     }
 
 
