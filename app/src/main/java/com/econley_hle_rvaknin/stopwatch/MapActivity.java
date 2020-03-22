@@ -69,8 +69,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     BottomNavigationView bottomNavigationView;
     private GoogleMap mMap;
+
     // Search
-    private SupportMapFragment mapFragment;
     SearchView searchView;
 
     // The entry point to the Fused Location Provider.
@@ -94,9 +94,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-
     static String CHANNEL_ID = "101";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -412,7 +410,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                         return true;
                     case R.id.favorite_routes:
-                        System.out.println("MENU FAVORITE SELECTED!!!");
+                        Log.d(TAG, "MENU FAVORITE SELECTED!!!");
                         return false;
                     case R.id.recent_routes:
                         findViewById(R.id.recyclerView1).bringToFront();

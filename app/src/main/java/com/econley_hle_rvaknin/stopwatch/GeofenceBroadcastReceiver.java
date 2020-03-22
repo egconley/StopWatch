@@ -63,5 +63,4 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         notificationManager.notify((int)(Math.random() * 100.0), builder.build());
     }
 
-
 }
