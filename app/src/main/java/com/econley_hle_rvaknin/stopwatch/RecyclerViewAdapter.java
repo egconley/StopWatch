@@ -27,13 +27,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private final String TAG = "rvrv";
     private LinkedList<String> mValues;
-    private Activity mActivity;
-    private final RecentDestinationsFragment.OnListFragmentInteractionListener mListener;
 
-    public RecyclerViewAdapter(LinkedList<String> items, RecentDestinationsFragment.OnListFragmentInteractionListener listener, Activity mActivity) {
+    public RecyclerViewAdapter(LinkedList<String> items) {
         mValues = items;
-        mListener = listener;
-        mActivity = mActivity;
     }
 
     @Override
@@ -49,8 +45,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.mTitleView.setText(mValues.get(position));
         holder.mView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String strAddress = mValues.get(position);
-                System.out.println("strAddress = " + strAddress);
+                String strAddress = holder.mItem;
                 SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(v.getContext());
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("isRecyclerViewClicked5",true);
