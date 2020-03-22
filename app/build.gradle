@@ -9,7 +9,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner" //ok
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
     buildTypes {
@@ -17,6 +17,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    testOptions {
+        unitTests.includeAndroidResources = true
     }
 }
 
@@ -32,10 +35,22 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation files('android.support.v7')
+    // unit testing
+    // Required -- JUnit 4 framework
+    testImplementation 'junit:junit:4.12'
+    // Optional -- Robolectric environment
+    testImplementation 'androidx.test:core:1.0.0' //changed from 'androidx.test:core:1.0.0'
+    testImplementation "org.robolectric:robolectric:4.0.2"
+    // Optional -- Mockito framework
+    testImplementation 'org.mockito:mockito-core:1.10.19'
+
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'//ok
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1' //ok
+    androidTestImplementation "com.android.support:support-annotations:27.1.1" //added
+    androidTestImplementation 'com.android.support.test:runner:1.0.2' //added
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    implementation 'org.jetbrains:annotations-java5:15.0'//added
 }
