@@ -15,6 +15,7 @@ import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.List;
 
+// resource: https://developer.android.com/training/location/geofencing
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
     static String CHANNEL_ID = "101";
@@ -61,6 +62,5 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
         notificationManager.notify((int)(Math.random() * 100.0), builder.build());
     }
-
 
 }

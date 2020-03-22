@@ -28,9 +28,6 @@ import java.util.LinkedList;
 
 /**
  * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
  */
 public class RecentDestinationsFragment extends Fragment {
     RecyclerView recyclerView;
@@ -39,7 +36,6 @@ public class RecentDestinationsFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
     private RecyclerViewAdapter adapter;
     private LinkedList<String> recentDestinations;
     Activity activity;
@@ -67,10 +63,9 @@ public class RecentDestinationsFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+
         recentDestinations = loadRecents();
-        System.out.println(recentDestinations.size());
         activity = getActivity();
-        System.out.println("activity = " + activity);
     }
 
     @Override
@@ -92,27 +87,12 @@ public class RecentDestinationsFragment extends Fragment {
         return view;
     }
 
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        }
-    }
-
     @Override
     public void onResume() {
         super.onResume();
         recentDestinations = loadRecents();
-        adapter = new RecyclerViewAdapter(recentDestinations, null, activity);
+        adapter = new RecyclerViewAdapter(recentDestinations);
         recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
 
@@ -142,16 +122,6 @@ public class RecentDestinationsFragment extends Fragment {
             recentDestinations = new LinkedList<>();
         }
 
-        // dedup list of recent destinations
-        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
-        HashSet<String> set = new HashSet<>();
-        for (String address : recentDestinations) {
-            set.add(address);
-        }
-        for (String address : set) {
-            distinctRecentDestinations.add(address);
-        }
-
-        return distinctRecentDestinations;
+        return recentDestinations;
     }
 }
