@@ -137,22 +137,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onResume();
         Log.i("rvrv", "On resume is being called");
 
-        String addressFromRecyclerView = getIntent().getStringExtra("address");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        isDataSentFromRecyclerView = sharedPreferences.getBoolean("isRecyclerViewClicked5", false);
-        isDataSentFromRecyclerView = false;
+        Bundle extras = getIntent().getExtras();
+        if (extras!=null) {
 
-        if (isDataSentFromRecyclerView) {
-            Log.i(TAG, "WORKING");
-
+            String addressFromRecyclerView = extras.getString("address");
             Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
             Address address = setAddress(addressFromRecyclerView, geocoder);
             userDialog(address);
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putBoolean("isRecyclerViewClicked5", false);
-        }
-        else {
+
+        }   else {
             Log.i(TAG, "Not resuming from recycler view click.");
         }
     }

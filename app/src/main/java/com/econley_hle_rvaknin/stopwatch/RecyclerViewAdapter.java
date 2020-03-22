@@ -1,27 +1,12 @@
 package com.econley_hle_rvaknin.stopwatch;
 
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.econley_hle_rvaknin.stopwatch.bottomnavigation.RecentDestinationsFragment;
-
-import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
@@ -46,12 +31,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.mView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String strAddress = holder.mItem;
-                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(v.getContext());
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("isRecyclerViewClicked5",true);
-                editor.apply();
                 Intent i = new Intent(v.getContext(),MapActivity.class);
                 i.putExtra("address",strAddress);
+                i.putExtra("recyclerViewAddress", true);
                 v.getContext().startActivity(i);
             }
         });
@@ -67,7 +49,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public final TextView mTitleView;
 
         public String mItem;
-
 
         public ViewHolder(View view) {
             super(view);
