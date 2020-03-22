@@ -69,7 +69,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     BottomNavigationView bottomNavigationView;
     private GoogleMap mMap;
-    private boolean isDataSentFromRecyclerView;
     // Search
     private SupportMapFragment mapFragment;
     SearchView searchView;
@@ -267,10 +266,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void saveToRecents(String address) {
         recentDestinations = loadRecents();
         recentDestinations.addFirst(address);
+        // dedup list of recent destinations before saving to shared preferences
+        HashSet<String> set = new HashSet<>(recentDestinations);
+        LinkedList<String> distinctRecentDestinations = new LinkedList<>(set);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(recentDestinations);
+        String json = gson.toJson(distinctRecentDestinations);
         editor.putString("recent destination list", json);
         editor.apply();
     }
@@ -282,15 +284,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Type type = new TypeToken<LinkedList<String>>() {
         }.getType();
         recentDestinations = gson.fromJson(json, type);
-
         if (recentDestinations == null) {
             recentDestinations = new LinkedList<>();
         }
-
-        // dedup list of recent destinations
-        HashSet<String> set = new HashSet<>(recentDestinations);
-        LinkedList<String> distinctRecentDestinations = new LinkedList<>(set);
-        return distinctRecentDestinations;
+        return recentDestinations;
     }
 
     public void passToGooglemap(LatLng latLng) {
