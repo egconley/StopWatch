@@ -104,12 +104,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
 
         recentDestinations = loadRecents();
-        System.out.println("size " + recentDestinations.size());
-
-        isDataSentFromRecyclerView = false;
-        for (String value : recentDestinations) {
-            System.out.println("value = " + value);
-        }
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -379,7 +373,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
         searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
-        Log.i("haitle16.MapActivity", "data from searchView: " + searchView);
         if (searchView != null) {
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
