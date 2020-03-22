@@ -69,8 +69,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     BottomNavigationView bottomNavigationView;
     private GoogleMap mMap;
-    private CameraPosition mCameraPosition;
-    private Geofence geofence;
     private boolean isDataSentFromRecyclerView;
     // Search
     private SupportMapFragment mapFragment;
@@ -92,7 +90,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
-    private String mLastKnownDestination;
 
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -117,7 +114,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+            CameraPosition mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
         // Retrieve the content view that renders the map.
         setContentView(R.layout.map_fragment);
@@ -212,9 +209,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void setDestination(Context context, String location) {
-        mLastKnownDestination = location;
-        Context appContext = getApplicationContext();
-        Geocoder geocoder = new Geocoder(appContext, Locale.getDefault());
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         Address address = setAddress(location, geocoder);
         LatLng marker = setNewMarker(address);
         setMapZoom(marker);
@@ -224,7 +219,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void setGeofence(double targetLat, double targetLong) {
         //// creating a geofence with lat long and radius
-        geofence = new Geofence.Builder()
+        Geofence geofence = new Geofence.Builder()
                 .setRequestId("destination")
                 .setCircularRegion(targetLat, targetLong, 300)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
@@ -306,15 +301,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         // dedup list of recent destinations
-        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
-        HashSet<String> set = new HashSet<>();
-        for (String address : recentDestinations) {
-            set.add(address);
-        }
-        for (String address : set) {
-            distinctRecentDestinations.add(address);
-        }
-
+        HashSet<String> set = new HashSet<>(recentDestinations);
+        LinkedList<String> distinctRecentDestinations = new LinkedList<>(set);
         return distinctRecentDestinations;
     }
 

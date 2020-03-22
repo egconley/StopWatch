@@ -143,14 +143,8 @@ public class RecentDestinationsFragment extends Fragment {
         }
 
         // dedup list of recent destinations
-        LinkedList<String> distinctRecentDestinations = new LinkedList<>();
-        HashSet<String> set = new HashSet<>();
-        for (String address : recentDestinations) {
-            set.add(address);
-        }
-        for (String address : set) {
-            distinctRecentDestinations.add(address);
-        }
+        HashSet<String> set = new HashSet<>(recentDestinations);
+        LinkedList<String> distinctRecentDestinations = new LinkedList<>(set);
 
         return distinctRecentDestinations;
     }
